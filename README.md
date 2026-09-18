@@ -1,93 +1,72 @@
-# Maria Lialko
+# Maria Lialko — AI Automation Engineer
 
 <div align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=7C3AED&center=true&vCenter=true&lines=AI+Automation+Engineer;n8n+%7C+AI+Agents;CRM+Automation" alt="Typing SVG" />
+  <strong>Designing practical AI-powered workflows for sales, customer support, and business operations.</strong><br />
+  <sub>Kharkiv, Ukraine · n8n · AI agents · CRM automation · workflow orchestration</sub>
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Location-Kharkiv%2C%20Ukraine-7C3AED?style=flat-square&logo=location&logoColor=white" alt="Location" />
-  <img src="https://img.shields.io/badge/Focus-AI+Automation-22C55E?style=flat-square" alt="Focus" />
-  <img src="https://img.shields.io/badge/Stack-n8n%20%2B%20AI%20Agents-0EA5E9?style=flat-square" alt="Stack" />
+  <a href="https://www.linkedin.com/in/lialko-maria-b46b22427">LinkedIn</a> ·
+  <a href="https://github.com/mariiarimmal-design/portfolio">GitHub portfolio</a>
 </div>
 
-Junior AI Automation Engineer from Kharkiv. I design and implement n8n workflows with AI agent integration to automate customer service, sales, and marketing processes.
-
-### Quick links
-- 📂 Portfolio: see the portfolio repository
-- 🎓 Currently enrolled in the GoIT AI Automation program
-- 💬 Open to projects involving AI agents and CRM process automation
-- 🔗 LinkedIn: [linkedin.com/in/lialko-maria-b46b22427](https://linkedin.com/in/lialko-maria-b46b22427)
-
 ---
 
-## What I do
+## About me
 
-### Business process automation
-- Auditing business processes
-- Process modeling and optimization
-- Workflow automation to reduce manual work
-- Error reduction and operational scaling
+I am a Junior AI Automation Engineer who designs and implements n8n workflows with AI-agent integrations. My focus is turning repetitive operational processes into reliable, observable systems with clear human-approval points where they matter.
 
-### AI agents and workflow automation
-- Building AI-driven solutions and intelligent agents
-- Automating repetitive business tasks
-- Connecting systems, tools, and data flows
-- Improving operational efficiency through smart orchestration
+I work across lead management, CRM automation, customer support, quality assurance, SLA monitoring, and AI-assisted sales operations.
 
-### Lead management and CRM automation
-- Designing automated lead funnels
-- Integrating CRM with marketing and communication tools
-- Lead qualification, routing, and distribution
-- Customer journey automation and response workflows
+> **Portfolio note:** These are educational and portfolio projects. Credentials, personal data, and private connection details must be replaced before deployment.
 
----
+## Featured projects
+
+| Project | What it demonstrates | Main integrations |
+|---|---|---|
+| [AI Call QA & Escalation](projects/ai-call-qa-escalation) | Transcription, structured QA scoring, escalation, and approval-gated communication | n8n, LLM, Google Sheets, Telegram, Gmail |
+| [AI Ticket Routing, SLA Escalation & Analytics](projects/ai-ticket-routing-sla) | AI classification, SLA deadlines, multi-level escalation, and analytics | n8n, Groq/Llama, Google Sheets, Slack |
+| [AI Sales Intelligence](projects/ai-sales-intelligence) | CRM activity analysis, deal-health scoring, and reporting | n8n, Zoho CRM, Claude, Telegram |
+| [AI Sales Automation](projects/ai-sales-automation) | BANT-oriented lead analysis and CRM reporting | n8n, Zoho CRM, PostgreSQL, Telegram |
+| [AI Sales Assistant](projects/ai-sales-assistant) | RAG-based objection handling and AI call scripts | n8n, Qdrant, Gemini, Claude, Telegram |
+| [AI Lead & Marketing Automation](projects/ai-lead-marketing-automation) | Website lead intake, CRM sync, segmentation, and marketing automation | n8n, Wix, Zoho CRM, Klaviyo |
+| [Website Inquiry Automation](projects/website-inquiry-automation) | Deduplication, priority flagging, confirmations, and follow-up | n8n, Webhooks, Google Sheets, Gmail |
+| [AI Self-Care Bot](projects/ai-self-care-bot) | Context-aware daily tasks and self-tracking | n8n, LLM, Telegram, Google Sheets |
+| [AI Image Approval Pipeline](projects/ai-image-approval-publishing) | AI content generation with human approval | n8n, image APIs, Telegram |
+
+## Capabilities
+
+- **AI workflow design:** prompt engineering, structured outputs, classification, routing, and human-in-the-loop controls.
+- **Customer support automation:** ticket triage, sentiment analysis, SLA tracking, escalation, and QA reporting.
+- **Sales automation:** lead qualification, CRM enrichment, deal-health monitoring, objection handling, and call-script generation.
+- **Reliable integrations:** webhooks, REST APIs, Google Workspace, Telegram, Slack, Gmail, Zoho CRM, Qdrant, and Klaviyo.
+- **Operational thinking:** deduplication, idempotency, status tracking, error workflows, fallback logic, and audit logs.
 
 ## Tech stack
 
-### AI & LLM integration
-- OpenAI API (GPT-4o)
-- Anthropic Claude
-- OpenRouter
-- Custom AI Agents / Assistant API
-- LLaMA
-- Grok
+`n8n` · `OpenAI` · `Anthropic Claude` · `Groq / Llama` · `OpenRouter` · `Google Gemini` · `Zoho CRM` · `PostgreSQL` · `Qdrant` · `Google Sheets` · `Gmail` · `Slack` · `Telegram` · `Wix` · `Klaviyo`
 
-### Automation & integration tools
-- n8n
-- Webhooks
-- REST API
+## Repository structure
 
-### CRM & databases
-- Google Sheets
-- Google Drive
+```text
+portfolio/
+├── README.md
+├── docs/WORKFLOW_MAP.md
+└── projects/
+    ├── ai-call-qa-escalation/
+    ├── ai-ticket-routing-sla/
+    ├── ai-sales-intelligence/
+    ├── ai-sales-automation/
+    ├── ai-sales-assistant/
+    ├── ai-lead-marketing-automation/
+    ├── website-inquiry-automation/
+    ├── ai-self-care-bot/
+    └── ai-image-approval-publishing/
+```
 
-### Communication & ticketing
-- Slack
-- Telegram API
-- Zendesk
-- Intercom
+## Contact
 
-### Process modeling
-- Workflow mapping
-- SLA design
-- Ticket routing
-- Escalation management
+Open to junior AI automation, CRM integration, customer-support automation, and workflow design opportunities.
 
----
-
-## Why work with me?
-
-I combine business process thinking with technical implementation, helping teams automate operational bottlenecks and build smarter customer-facing workflows.
-
-I focus on practical solutions that save time, improve response speed, and make business operations easier to scale.
-
----
-
-## Open to
-
-- AI agent implementation projects
-- CRM automation workflows
-- Sales and support process automation
-- Business process optimization and integration design
-
-If you want to build smarter workflows and reduce manual work, I’d be happy to connect.
+- LinkedIn: [lialko-maria-b46b22427](https://www.linkedin.com/in/lialko-maria-b46b22427)
+- GitHub: [mariiarimmal-design](https://github.com/mariiarimmal-design)
