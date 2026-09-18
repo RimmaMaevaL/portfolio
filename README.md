@@ -1,62 +1,98 @@
-# Maria Lialko — AI Automation Engineer
-
 <div align="center">
-  <strong>Designing practical AI-powered workflows for sales, customer support, and business operations.</strong><br />
-  <sub>Kharkiv, Ukraine · n8n · AI agents · CRM automation · workflow orchestration</sub>
-</div>
 
-<div align="center">
-  <a href="https://www.linkedin.com/in/lialko-maria-b46b22427">LinkedIn</a> ·
-  <a href="https://github.com/mariiarimmal-design/portfolio">GitHub portfolio</a>
+# ⚡ AI Automation Portfolio
+
+### Practical AI workflows that turn repetitive operations into reliable systems
+
+<p>
+  <a href="https://github.com/RimmaMaevaL/portfolio/tree/main/projects"><strong>Explore projects</strong></a>
+  ·
+  <a href="https://github.com/RimmaMaevaL/portfolio/blob/main/docs/WORKFLOW_MAP.md"><strong>View workflow map</strong></a>
+  ·
+  <a href="https://www.linkedin.com/in/lialko-maria-b46b22427"><strong>Connect on LinkedIn</strong></a>
+</p>
+
+<img src="https://img.shields.io/badge/n8n-automation-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
+<img src="https://img.shields.io/badge/AI_agents-production--minded-7C3AED?style=for-the-badge" alt="AI agents" />
+<img src="https://img.shields.io/badge/human--in--the--loop-approval--first-0F766E?style=for-the-badge" alt="Human in the loop" />
+
 </div>
 
 ---
 
-## About me
+## 👋 About
 
-I am a Junior AI Automation Engineer who designs and implements n8n workflows with AI-agent integrations. My focus is turning repetitive operational processes into reliable, observable systems with clear human-approval points where they matter.
+I’m **Maria Lialko**, a Junior AI Automation Engineer focused on designing n8n workflows that connect AI models, CRMs, communication tools, and business data.
 
-I work across lead management, CRM automation, customer support, quality assurance, SLA monitoring, and AI-assisted sales operations.
+This portfolio demonstrates how I approach automation: start with a real operational bottleneck, design a clear workflow, add guardrails and observability, then make the result easy for a human team to use.
 
-> **Portfolio note:** These are educational and portfolio projects. Credentials, personal data, and private connection details must be replaced before deployment.
+> **Portfolio note** — These are educational and portfolio projects. Replace credentials, personal data, connection details, and test endpoints before deploying any workflow in production.
 
-## Featured projects
+## ✨ What you’ll find here
 
-| Project | What it demonstrates | Main integrations |
+| Area | Examples |
+|---|---|
+| **Sales automation** | Lead qualification, CRM enrichment, deal-health scoring, objection handling |
+| **Customer support** | Ticket triage, sentiment analysis, SLA monitoring, escalation |
+| **Quality assurance** | Call transcription, structured scoring, manager review, feedback loops |
+| **Content operations** | AI generation, approval gates, publishing, decision logging |
+| **Reliable integrations** | Webhooks, REST APIs, Google Workspace, Telegram, Slack, Zoho CRM, Qdrant |
+
+## 🚀 Featured projects
+
+| Project | The workflow | Stack |
 |---|---|---|
-| [AI Call QA & Escalation](projects/ai-call-qa-escalation) | Transcription, structured QA scoring, escalation, and approval-gated communication | n8n, LLM, Google Sheets, Telegram, Gmail |
-| [AI Ticket Routing, SLA Escalation & Analytics](projects/ai-ticket-routing-sla) | AI classification, SLA deadlines, multi-level escalation, and analytics | n8n, Groq/Llama, Google Sheets, Slack |
-| [AI Sales Intelligence](projects/ai-sales-intelligence) | CRM activity analysis, deal-health scoring, and reporting | n8n, Zoho CRM, Claude, Telegram |
-| [AI Sales Automation](projects/ai-sales-automation) | BANT-oriented lead analysis and CRM reporting | n8n, Zoho CRM, PostgreSQL, Telegram |
-| [AI Sales Assistant](projects/ai-sales-assistant) | RAG-based objection handling and AI call scripts | n8n, Qdrant, Gemini, Claude, Telegram |
-| [AI Lead & Marketing Automation](projects/ai-lead-marketing-automation) | Website lead intake, CRM sync, segmentation, and marketing automation | n8n, Wix, Zoho CRM, Klaviyo |
-| [Website Inquiry Automation](projects/website-inquiry-automation) | Deduplication, priority flagging, confirmations, and follow-up | n8n, Webhooks, Google Sheets, Gmail |
-| [AI Self-Care Bot](projects/ai-self-care-bot) | Context-aware daily tasks and self-tracking | n8n, LLM, Telegram, Google Sheets |
-| [AI Image Approval Pipeline](projects/ai-image-approval-publishing) | AI content generation with human approval | n8n, image APIs, Telegram |
+| [**AI Call QA & Escalation**](projects/ai-call-qa-escalation) | Transcribes support calls, scores eight QA criteria, escalates weak results, and sends customer communication only after approval. | `n8n` `Groq/Llama` `Whisper` `Sheets` `Telegram` `Gmail` |
+| [**AI Ticket Routing & SLA**](projects/ai-ticket-routing-sla) | Classifies incoming tickets, calculates deadlines, tracks SLA risk, and routes escalations. | `n8n` `Groq/Llama` `Sheets` `Slack` |
+| [**AI Sales Intelligence**](projects/ai-sales-intelligence) | Analyzes CRM activity, scores deal health, and delivers actionable sales reports. | `n8n` `Zoho CRM` `Claude` `Telegram` |
+| [**AI Sales Assistant**](projects/ai-sales-assistant) | Uses retrieval-augmented context to support objection handling and generate call scripts. | `n8n` `Qdrant` `Gemini` `Claude` `Telegram` |
+| [**AI Lead & Marketing Automation**](projects/ai-lead-marketing-automation) | Captures website leads, syncs CRM records, segments contacts, and triggers marketing actions. | `n8n` `Wix` `Zoho CRM` `Klaviyo` |
+| [**Website Inquiry Automation**](projects/website-inquiry-automation) | Deduplicates inquiries, flags priority, sends confirmations, and starts follow-up sequences. | `n8n` `Webhooks` `Sheets` `Gmail` |
+| [**AI Self-Care Bot**](projects/ai-self-care-bot) | Turns daily check-ins into context-aware tasks and personal tracking. | `n8n` `LLM` `Telegram` `Sheets` |
+| [**AI Image Approval Pipeline**](projects/ai-image-approval-publishing) | Generates visual content, sends a preview for review, and publishes only after explicit approval. | `n8n` `Image APIs` `Telegram` |
 
-## Capabilities
+## 🧠 My automation principles
 
-- **AI workflow design:** prompt engineering, structured outputs, classification, routing, and human-in-the-loop controls.
-- **Customer support automation:** ticket triage, sentiment analysis, SLA tracking, escalation, and QA reporting.
-- **Sales automation:** lead qualification, CRM enrichment, deal-health monitoring, objection handling, and call-script generation.
-- **Reliable integrations:** webhooks, REST APIs, Google Workspace, Telegram, Slack, Gmail, Zoho CRM, Qdrant, and Klaviyo.
-- **Operational thinking:** deduplication, idempotency, status tracking, error workflows, fallback logic, and audit logs.
+- **Human-in-the-loop by default** — sensitive or customer-facing actions require an explicit approval step.
+- **Structured AI outputs** — predictable JSON and validation instead of fragile free-form text.
+- **Idempotent workflows** — deduplication and status checks prevent duplicate actions.
+- **Observable execution** — clear logs, decision records, fallback paths, and useful notifications.
+- **Useful before flashy** — automation should remove operational friction and make the next action obvious.
 
-## Tech stack
+## 🧩 Typical architecture
 
-`n8n` · `OpenAI` · `Anthropic Claude` · `Groq / Llama` · `OpenRouter` · `Google Gemini` · `Zoho CRM` · `PostgreSQL` · `Qdrant` · `Google Sheets` · `Gmail` · `Slack` · `Telegram` · `Wix` · `Klaviyo`
+```mermaid
+flowchart LR
+    A[Trigger\nWebhook / Schedule / Drive] --> B[Normalize & validate]
+    B --> C[AI analysis\nclassify / score / generate]
+    C --> D{Risk or approval\nrequired?}
+    D -- No --> E[Execute action\nCRM / email / publish]
+    D -- Yes --> F[Human approval\nTelegram / Slack]
+    F --> E
+    E --> G[Log result & metrics]
+    C -. failure .-> H[Fallback / retry / alert]
+    H --> G
+```
 
-## Repository structure
+## 🛠️ Tech stack
+
+**Automation**  `n8n` · Webhooks · REST APIs · JavaScript expressions  
+**AI**  `OpenAI` · `Anthropic Claude` · `Groq / Llama` · `OpenRouter` · `Google Gemini`  
+**Data & CRM**  `Zoho CRM` · `PostgreSQL` · `Qdrant` · `Google Sheets`  
+**Communication**  `Telegram` · `Slack` · `Gmail`  
+**Marketing**  `Wix` · `Klaviyo`
+
+## 🗂️ Repository map
 
 ```text
 portfolio/
-├── README.md
-├── docs/WORKFLOW_MAP.md
+├── README.md                         ← you are here
+├── docs/
+│   └── WORKFLOW_MAP.md               ← cross-project architecture map
 └── projects/
     ├── ai-call-qa-escalation/
     ├── ai-ticket-routing-sla/
     ├── ai-sales-intelligence/
-    ├── ai-sales-automation/
     ├── ai-sales-assistant/
     ├── ai-lead-marketing-automation/
     ├── website-inquiry-automation/
@@ -64,9 +100,17 @@ portfolio/
     └── ai-image-approval-publishing/
 ```
 
-## Contact
+Every project includes a focused case study with the business problem, workflow logic, integrations, expected outcome, and available n8n modules.
 
-Open to junior AI automation, CRM integration, customer-support automation, and workflow design opportunities.
+## 📬 Let’s connect
 
-- LinkedIn: [lialko-maria-b46b22427](https://www.linkedin.com/in/lialko-maria-b46b22427)
-- GitHub: [mariiarimmal-design](https://github.com/mariiarimmal-design)
+Open to junior opportunities in **AI automation, CRM integrations, customer-support systems, and workflow design**.
+
+- **LinkedIn:** [lialko-maria-b46b22427](https://www.linkedin.com/in/lialko-maria-b46b22427)
+- **GitHub:** [mariiarimmal-design](https://github.com/mariiarimmal-design)
+
+<div align="center">
+
+**Build less manual work. Keep humans in control.**
+
+</div>
