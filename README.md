@@ -1,25 +1,23 @@
- 
+Junior AI Automation Engineer from Kharkiv. I design and implement n8n workflows with AI agent integration to automate customer service, sales, and marketing.
 
-Junior AI Automation Engineer з Харкова. Проєктую та впроваджую n8n-воркфлоу з інтеграцією AI-агентів для автоматизації клієнтського сервісу, продажів і маркетингу.
+📂 Portfolio: see the portfolio repository
+🎓 Currently enrolled in the GoIT AI Automation program
+💬 Open to projects involving the implementation of AI agents and the automation of CRM processes
+🔗 LinkedIn: linkedin.com/in/lialko-maria-b46b22427
+Business Process Automation: auditing, modeling, optimizing, and automating business processes to reduce manual work, minimize errors, and scale operations.
 
+AI agents and workflow automation: developing solutions based on artificial intelligence and intelligent agents that automate workflows, system interactions, data processing, and repetitive business tasks.
 
-- 📂 Портфоліо: дивись репозиторій [portfolio](https://github.com/mariiarimmal-design/portfolio)
-- 🎓 Проходжу програму GoIT AI Automation
-- 💬 Відкрита до проєктів на впровадження AI-агентів та автоматизацію CRM-процесів
-- 🔗 LinkedIn: linkedin.com/in/lialko-maria-b46b22427
- 
+Lead Management and CRM Automation: Building automated lead management funnels, integrating CRM with marketing and communication tools, and automating lead qualification, distribution, and customer support.
 
+🔧 Tech Stack:
 
-**Автоматизація бізнес-процесів:** аудит бізнес-процесів, їх моделювання, оптимізація та автоматизація з метою зменшення ручної роботи, мінімізації помилок і масштабування операцій.
+AI and LLM integration: OpenAI API (GPT-4o), Anthropic Claude, OpenRouter, Custom AI Agents / Assistant API, LLaMA, Grok.
 
-**AI-агенти та автоматизація workflow:** розробка рішень на базі штучного інтелекту та інтелектуальних агентів, які автоматизують робочі процеси, взаємодію із системами, обробку даних і повторювані бізнес-завдання.
+Automation and integration tools: n8n, webhooks, REST API.
 
-**Обробка лідів та CRM-автоматизація:** побудова автоматизованих воронок обробки лідів, інтеграція CRM із маркетинговими та комунікаційними інструментами, автоматизація кваліфікації, розподілу та клієнтської підтримки.
+CRM and databases: Google Sheets, Google Drive.
 
-- 🔧 Стек:
+Communication and ticketing: Slack, Telegram API, Zendesk, Intercom.
 
-- **Інтеграція AI та LLM:** OpenAI API (GPT-4o), Anthropic Claude, OpenRouter, Custom AI Agents / Assistant API, LLaMA, Grok.
-- **Інструменти автоматизації та інтеграції:** n8n, webhooks, REST API.
-- **CRM і бази даних:** Google Sheets, Google Drive.
-- **Комунікація та ticketing:** Slack, Telegram API, Zendesk, Intercom.
-- **Моделювання процесів:** workflow mapping, SLA, ticket routing, escalation management
+Process modeling: workflow mapping, SLA, ticket routing, escalation management
