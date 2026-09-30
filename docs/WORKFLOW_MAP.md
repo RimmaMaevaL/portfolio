@@ -29,6 +29,15 @@
 - `ai-self-care-bot.json` — Telegram self-care MVP.
 - `ai-image-approval-publishing.json` — reserved filename for the image-generation project; its JSON export was not included in this upload.
 
+## D&D Session Organizer Bot
+
+- `dnd-router.json` — receives Telegram updates, normalizes actions, and routes them to command executors.
+- `dnd-scheduler.json` — runs every 10 minutes, builds the next session from the schedule, and sends due polls, summaries, and reminders.
+
+## Yabko Google Maps Review Intelligence
+
+- `workflow.json` — scrapes public reviews, filters non-target content, classifies each review, computes negative-share metrics, and delivers a Google Docs report.
+
 ## Security checklist
 
 Replace API keys, authorization headers, chat IDs, email addresses, private URLs, spreadsheet IDs, webhook URLs, signed download links, and credential IDs before making workflow exports public. Use placeholders such as `YOUR_API_KEY`, `YOUR_SPREADSHEET_ID`, and `YOUR_TELEGRAM_CHAT_ID`.
