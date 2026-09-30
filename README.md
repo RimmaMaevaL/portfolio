@@ -24,9 +24,9 @@
 
 I’m **Maria Lialko**, a Junior AI Automation Engineer focused on designing n8n workflows that connect AI models, CRMs, communication tools, and business data.
 
-This portfolio demonstrates how I approach automation: start with a real operational bottleneck, design a clear workflow, add guardrails and observability, then make the result easy for a human team to use.
+This portfolio demonstrates how I approach automation: start with a real operational bottleneck, design a clear workflow, add guardrails and observability, then make the result easy for a human team to operate.
 
-> **Portfolio note** — These are educational and portfolio projects. Replace credentials, personal data, connection details, and test endpoints before deploying any workflow in production.
+> **Portfolio note** — Most projects in this repository are educational and portfolio exercises. The two entries in “Real client work” were built for real clients. Replace credentials, personal data, connection details, and test endpoints before deploying any workflow in production.
 
 ## ✨ What you’ll find here
 
@@ -35,19 +35,28 @@ This portfolio demonstrates how I approach automation: start with a real operati
 | **Sales automation** | Lead qualification, CRM enrichment, deal-health scoring, objection handling |
 | **Customer support** | Ticket triage, sentiment analysis, SLA monitoring, escalation |
 | **Quality assurance** | Call transcription, structured scoring, manager review, feedback loops |
+| **Community operations** | Scheduling bots, attendance polls, reminders, party coordination |
+| **Customer insight research** | Review scraping, AI classification, topic analysis, reporting |
 | **Content operations** | AI generation, approval gates, publishing, decision logging |
 | **Reliable integrations** | Webhooks, REST APIs, Google Workspace, Telegram, Slack, Zoho CRM, Qdrant |
+
+## 🌍 Real client work
+
+| Project | The workflow | Stack |
+|---|---|---|
+| [**D&D Session Organizer Bot**](projects/dnd-session-organizer-bot) | Paid client project. Coordinates attendance polling, GM decisions, and reminders across party chat groups. | `n8n` `Telegram Bot API` `n8n Data Tables` `JavaScript` `Luxon` `PikaPods` |
+| [**Yabko Google Maps Review Intelligence**](projects/yabko-google-maps-review-intelligence) | Pro bono pilot. Scrapes public Google Maps reviews, classifies topics and sentiment, and turns them into a client-ready store report. | `n8n` `Apify` `OpenAI` `Google Sheets` `Google Docs` `JavaScript` |
 
 ## 🚀 Featured projects
 
 | Project | The workflow | Stack |
 |---|---|---|
-| [**AI Call QA & Escalation**](projects/ai-call-qa-escalation) | Transcribes support calls, scores eight QA criteria, escalates weak results, and sends customer communication only after approval. | `n8n` `Groq/Llama` `Whisper` `Sheets` `Telegram` `Gmail` |
-| [**AI Ticket Routing & SLA**](projects/ai-ticket-routing-sla) | Classifies incoming tickets, calculates deadlines, tracks SLA risk, and routes escalations. | `n8n` `Groq/Llama` `Sheets` `Slack` |
+| [**AI Call QA & Escalation**](projects/ai-call-qa-escalation) | Transcribes support calls, scores eight QA criteria, escalates weak results, and sends customer communication only after approval. | `n8n` `Groq/Llama` `Whisper` `Drive` `Sheets` `Telegram` |
+| [**AI Ticket Routing & SLA**](projects/ai-ticket-routing-sla) | Classifies incoming tickets, calculates deadlines, tracks SLA risk, and routes escalations. | `n8n` `Groq/Llama` `Gmail` `Sheets` `Slack` |
 | [**AI Sales Intelligence**](projects/ai-sales-intelligence) | Analyzes CRM activity, scores deal health, and delivers actionable sales reports. | `n8n` `Zoho CRM` `Claude` `Telegram` |
 | [**AI Sales Assistant**](projects/ai-sales-assistant) | Uses retrieval-augmented context to support objection handling and generate call scripts. | `n8n` `Qdrant` `Gemini` `Claude` `Telegram` |
-| [**AI Lead & Marketing Automation**](projects/ai-lead-marketing-automation) | Captures website leads, syncs CRM records, segments contacts, and triggers marketing actions. | `n8n` `Wix` `Zoho CRM` `Klaviyo` |
-| [**Website Inquiry Automation**](projects/website-inquiry-automation) | Deduplicates inquiries, flags priority, sends confirmations, and starts follow-up sequences. | `n8n` `Webhooks` `Sheets` `Gmail` |
+| [**AI Lead & Marketing Automation**](projects/ai-lead-marketing-automation) | Captures website leads, syncs CRM records, segments contacts, and triggers marketing actions. | `n8n` `Wix` `Zoho CRM` `Sheets` `Klaviyo` |
+| [**Website Inquiry Automation**](projects/website-inquiry-automation) | Deduplicates inquiries, flags priority, sends confirmations, and starts follow-up sequences. | `n8n` `Webhooks` `Sheets` `Telegram` |
 | [**AI Self-Care Bot**](projects/ai-self-care-bot) | Turns daily check-ins into context-aware tasks and personal tracking. | `n8n` `LLM` `Telegram` `Sheets` |
 | [**AI Image Approval Pipeline**](projects/ai-image-approval-publishing) | Generates visual content, sends a preview for review, and publishes only after explicit approval. | `n8n` `Image APIs` `Telegram` |
 
@@ -76,10 +85,11 @@ flowchart LR
 
 ## 🛠️ Tech stack
 
-**Automation**  `n8n` · Webhooks · REST APIs · JavaScript expressions  
+**Automation**  `n8n` · `n8n Data Tables` · Webhooks · REST APIs · JavaScript expressions  
 **AI**  `OpenAI` · `Anthropic Claude` · `Groq / Llama` · `OpenRouter` · `Google Gemini`  
-**Data & CRM**  `Zoho CRM` · `PostgreSQL` · `Qdrant` · `Google Sheets`  
+**Data & CRM**  `Zoho CRM` · `PostgreSQL` · `Qdrant` · `Google Sheets` · `Google Docs`  
 **Communication**  `Telegram` · `Slack` · `Gmail`  
+**Research & infrastructure**  `Apify` · `PikaPods`  
 **Marketing**  `Wix` · `Klaviyo`
 
 ## 🗂️ Repository map
@@ -97,6 +107,8 @@ portfolio/
     ├── ai-lead-marketing-automation/
     ├── website-inquiry-automation/
     ├── ai-self-care-bot/
+    ├── dnd-session-organizer-bot/
+    ├── yabko-google-maps-review-intelligence/
     └── ai-image-approval-publishing/
 ```
 
