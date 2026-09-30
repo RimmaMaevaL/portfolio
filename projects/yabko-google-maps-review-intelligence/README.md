@@ -1,48 +1,78 @@
-# Yabko Google Maps Review Intelligence
+<div align="center">
 
-A review-analysis workflow that collects public customer feedback across a retail chain, classifies it by topic and sentiment, and turns the results into a practical report for the marketing team.
+# 🧠 Yabko Google Maps Review Intelligence
 
-## Business problem
+### Turning public customer feedback into operational insight for a retail network
 
-Yabko, a Ukrainian retail chain of Apple stores and service centers with 130+ locations, had thousands of public Google Maps reviews spread across many store cards. The team had no systematic way to see which topics and which locations generated the most negative feedback.
+<p>
+  <a href="../../">← Back to portfolio</a>
+  ·
+  <a href="https://github.com/RimmaMaevaL/portfolio/tree/main/projects/yabko-google-maps-review-intelligence">Browse project files</a>
+</p>
 
-## Workflow
+<img src="https://img.shields.io/badge/n8n-workflow-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
+<img src="https://img.shields.io/badge/Apify-scraping-0F766E?style=for-the-badge" alt="Apify" />
+<img src="https://img.shields.io/badge/OpenAI-classification-7C3AED?style=for-the-badge" alt="OpenAI" />
+<img src="https://img.shields.io/badge/Google%20Docs%20%2B%20Sheets-reporting-4285F4?style=for-the-badge" alt="Google Docs and Sheets" />
 
-One n8n workflow handles the full cycle:
+</div>
 
-1. Apify Google Maps Scraper collects reviews from the last 12 months.
-2. The workflow filters out competitor stores with similar names and removes reviews without text.
-3. Reviews are batched in groups of 15 with short IDs such as r1 to r15.
-4. An OpenAI model returns topic, sentiment, and a short summary as JSON.
-5. A Code node parses the JSON with try/catch and marks failed batches as `parse_failed` instead of losing data.
-6. Another Code node calculates negative share by topic and by store.
-7. A second LLM writes a plain-language report in Google Docs.
-8. Raw classified rows are saved in Google Sheets.
+---
+
+## ✨ What this project does
+
+This workflow collects public Google Maps reviews across many store cards, filters and normalizes the data, classifies each review by topic and sentiment, and turns the results into a practical business report.
+
+It helps a retail chain identify which problems happen most often and where they are concentrated.
+
+## 🎯 The business challenge
+
+Yabko had thousands of public reviews spread across many store pages, but no systematic way to detect recurring issues or compare stores consistently. The challenge was not just collecting reviews — it was turning raw public feedback into usable operational insight.
+
+## 🔄 Workflow at a glance
 
 ```mermaid
 flowchart LR
-    A[Apify Google Maps Scraper
-    all stores, last 12 months] --> B[Filter and normalize reviews]
-    B --> C[Batch in groups of 15]
-    C --> D[OpenAI classification]
-    D --> E[Parse JSON and validate]
-    E --> F[Aggregate negative share by topic and store]
-    F --> G[Write report to Google Docs]
-    E --> H[Store raw rows in Google Sheets]
+    A[📦 Apify Google Maps scraper] --> B[🧹 Filter and normalize reviews]
+    B --> C[🧩 Batch reviews in groups]
+    C --> D[🧠 OpenAI classification]
+    D --> E[✅ Parse and validate JSON]
+    E --> F[📊 Aggregate negative share by topic + store]
+    F --> G[📝 Write summary report to Google Docs]
+    E --> H[📋 Save raw classified rows in Sheets]
 ```
 
-## Stack
+## 🧠 Why this matters
 
-`n8n` · `Apify` · `OpenAI` · `Google Sheets` · `Google Docs` · `JavaScript`
+The system does more than count stars. It detects recurring negative themes, lets the marketing or operations team compare stores, and helps prioritize which branches need attention.
 
-## Outcome
+## 🛠️ Technology stack
 
-The project processed 5,794 reviews across 133 stores in 47 cities and classified 3,712 reviews with text. The output surfaced the most common negative topics and the stores that needed attention, with all figures computed in code before being passed to the reporting model.
+| Component | Role |
+|---|---|
+| **n8n** | orchestration and data pipeline |
+| **Apify** | public review scraping |
+| **OpenAI** | topic and sentiment classification |
+| **Google Sheets** | structured raw data storage |
+| **Google Docs** | report generation |
+| **JavaScript** | validation and aggregation logic |
 
-## Privacy note
+## 📦 Included workflow modules
 
-This project uses only public reviews and no personal data of reviewers.
+| File | Purpose |
+|---|---|
+| [`workflow.json`](workflow.json) | complete review intelligence workflow |
 
-## Modules
+## ✅ Outcome
 
-- `workflow.json`
+The project processed 5,794 reviews across 133 stores in 47 cities and classified 3,712 reviews with text. The output surfaced the most common negative topics and the stores that needed attention most quickly.
+
+> The project uses only public reviews and does not expose personal reviewer data.
+
+---
+
+<div align="center">
+
+**Turn noisy reviews into clear business signals.**
+
+</div>

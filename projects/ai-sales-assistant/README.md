@@ -1,23 +1,80 @@
-# AI Sales Assistant
+<div align="center">
 
-A modular sales-assistance system combining a Qdrant knowledge base with Telegram interfaces for objection handling and lead-specific call scripts.
+# 🤖 AI Sales Assistant
 
-## Modules
+### A smart sales copilot for objection handling and call-script generation
 
-- Knowledge-base loader: prepares objection and case records, creates Gemini embeddings, and loads Qdrant.
-- Objection-handling bot: retrieves relevant knowledge and generates a response.
-- Call-script generator: accepts a Zoho Lead ID and returns a status, recommendation, call script, and key question.
+<p>
+  <a href="../../">← Back to portfolio</a>
+  ·
+  <a href="https://github.com/RimmaMaevaL/portfolio/tree/main/projects/ai-sales-assistant">Browse project files</a>
+</p>
 
-## Stack
+<img src="https://img.shields.io/badge/n8n-automation-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
+<img src="https://img.shields.io/badge/Qdrant-vector-db-0F766E?style=for-the-badge" alt="Qdrant" />
+<img src="https://img.shields.io/badge/Gemini-embeddings-7C3AED?style=for-the-badge" alt="Gemini embeddings" />
+<img src="https://img.shields.io/badge/Claude-reasoning-EC4899?style=for-the-badge" alt="Claude" />
 
-`n8n` · `Qdrant` · `Google Gemini embeddings` · `Anthropic Claude` · `Zoho CRM` · `Telegram`
+</div>
 
-## Outcome
+---
 
-A call script can be delivered in Telegram in under 10 seconds after a valid lead ID is submitted. A race-condition bug found during development is a strong technical case study: dependent branches must be synchronized before consuming their output.
+## ✨ What this project does
 
-## Modules
+This system combines a Qdrant knowledge base with Telegram-based sales tooling. It helps sales teams handle objections and generate lead-specific call scripts based on context.
 
-- `qdrant-knowledge-base-loader.json`
-- `telegram-objection-handling-bot.json`
-- `lead-call-script-generator.json`
+It is a practical example of retrieval-augmented generation applied to real sales operations.
+
+## 🎯 The business challenge
+
+Sales teams often lose time searching for the right response to objections or preparing a consistent script for each lead. Without a reusable knowledge layer, the quality of outbound communication varies a lot.
+
+## 🔄 Workflow at a glance
+
+```mermaid
+flowchart LR
+    A[📚 Knowledge-base loader] --> B[🧠 Embeddings in Qdrant]
+    B --> C[💬 Objection handling bot]
+    C --> D[🔍 Retrieve relevant context]
+    D --> E[📝 Generate response]
+    F[🧾 Lead ID] --> G[📜 Call-script generator]
+    G --> H[📲 Return script + recommendation]
+```
+
+## 🧠 Included capabilities
+
+- Knowledge-base loader for objection and case records
+- Telegram objection-handling bot
+- Call-script generator for a specific lead
+- Response logic combining retrieved context with AI reasoning
+
+## 🛠️ Technology stack
+
+| Component | Role |
+|---|---|
+| **n8n** | automation orchestration |
+| **Qdrant** | vector search and memory store |
+| **Google Gemini embeddings** | semantic embeddings |
+| **Anthropic Claude** | response generation and reasoning |
+| **Zoho CRM** | lead context source |
+| **Telegram** | interface for sales teams |
+
+## 📦 Included workflow modules
+
+| File | Purpose |
+|---|---|
+| [`qdrant-knowledge-base-loader.json`](qdrant-knowledge-base-loader.json) | prepares and stores knowledge base |
+| [`telegram-objection-handling-bot.json`](telegram-objection-handling-bot.json) | objection support bot |
+| [`lead-call-script-generator.json`](lead-call-script-generator.json) | lead-specific call script generation |
+
+## ✅ Outcome
+
+A call script can be returned in Telegram in under 10 seconds after a valid lead ID is submitted. The project also captures a good technical lesson: complex automation logic must be designed with concurrency and dependency handling in mind.
+
+---
+
+<div align="center">
+
+**Better answers. Better scripts. Better sales conversations.**
+
+</div>

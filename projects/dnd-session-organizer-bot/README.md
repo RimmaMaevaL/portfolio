@@ -1,55 +1,88 @@
-# D&D Session Organizer Bot
+<div align="center">
 
-A Telegram bot that automates session polling, GM summaries, and player reminders for tabletop RPG parties.
+# 🎲 D&D Session Organizer Bot
 
-## Business problem
+### A Telegram bot that keeps group sessions organized without the manual chaos
 
-A game master running 2 to 4 parties of 4 to 5 players spent 30 to 45 minutes every week manually asking who was attending each session, chasing silent players, and renegotiating when attendance collapsed.
+<p>
+  <a href="../../">← Back to portfolio</a>
+  ·
+  <a href="https://github.com/RimmaMaevaL/portfolio/tree/main/projects/dnd-session-organizer-bot">Browse project files</a>
+</p>
 
-## Workflow
+<img src="https://img.shields.io/badge/n8n-automation-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
+<img src="https://img.shields.io/badge/Telegram-bot-28A7E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" />
+<img src="https://img.shields.io/badge/Data%20Tables-state%20management-0F766E?style=for-the-badge" alt="n8n Data Tables" />
+<img src="https://img.shields.io/badge/JavaScript-logic-F59E0B?style=for-the-badge" alt="JavaScript" />
 
-The bot runs two main workflows:
+</div>
 
-**DnD Router** (19 nodes) receives every Telegram update and turns it into a list of actions with an operation field. A Switch node routes those actions to executor nodes that match command patterns.
+---
 
-**DnD Scheduler** (13 nodes) runs every 10 minutes, creates the next session from the schedule, and sends what is due at each stage:
+## ✨ What this project does
 
-1. Poll with Yes and No buttons at T-48h.
-2. GM summary with three decision buttons about 12h after the poll.
-3. Reminder for players who said yes and re-tag of silent players at T-24h.
-4. Re-tag of silent players only at T-4h.
-5. Final reminder at T-2h or a joke if the session was cancelled.
+This Telegram bot automates session polling, GM summaries, and player reminders for tabletop RPG parties.
 
-Quiet hours from 00:00 to 07:00 allow only the T-2h reminder. State lives in four n8n Data Tables: `dnd_groups`, `dnd_players`, `dnd_games`, and `dnd_answers`.
+It keeps the game master from manually chasing attendance and reduces “silent-player” churn before each session.
+
+## 🎯 The business challenge
+
+A game master running multiple groups spent significant time each week asking who was attending, reminding players, and managing session decisions. That manual overhead created friction before the game even started.
+
+## 🔄 Workflow at a glance
 
 ```mermaid
 flowchart LR
-    A[Telegram update] --> B[Normalize actions]
-    B --> C[DnD Router
-    command + button handling]
-    C --> D[Data Tables
-    groups, players, games, answers]
-    D --> E[DnD Scheduler
-    every 10 minutes]
-    E --> F[Stage decision
-    poll / summary / reminder]
-    F --> G[Send message in Telegram]
-    G --> H[Write stage flag only after success]
+    A[📨 Telegram update] --> B[🧹 Normalize command + action]
+    B --> C[🧭 Router: command + button handling]
+    C --> D[(Data Tables: groups, players, games, answers)]
+    D --> E[⏱️ Scheduler every 10 minutes]
+    E --> F[📣 Stage decision: poll / summary / reminder]
+    F --> G[💬 Send message in Telegram]
+    G --> H[✅ Write stage flag only after success]
 ```
 
-## Stack
+## 🧠 How it works
 
-`n8n` · `Telegram Bot API` · `n8n Data Tables` · `JavaScript` · `Luxon` · `PikaPods`
+The bot runs two main workflows:
 
-## Outcome
+- **DnD Router** handles Telegram updates and routes actions by command or button
+- **DnD Scheduler** manages timed reminders and session stages
 
-The bot removes the manual coordination work from the GM and reduces silent-player churn before each session. It handles polling, reminders, and summary decisions in one place, while keeping per-party permissions and stage logic deterministic.
+It supports a lifecycle of:
 
-## Privacy note
+1. poll at T-48h
+2. GM summary at T-12h
+3. reminder for confirmed players at T-24h
+4. re-tagging of silent players at T-4h
+5. final reminder at T-2h or cancellation message
 
-Screenshots come from a test chat. No player names, Telegram IDs, or personal data are published.
+## 🛠️ Technology stack
 
-## Modules
+| Component | Role |
+|---|---|
+| **n8n** | orchestration and stateful automation |
+| **Telegram Bot API** | interaction layer |
+| **n8n Data Tables** | persistent party and session state |
+| **JavaScript** | process logic and stage handling |
+| **Luxon** | time scheduling and deadlines |
+| **PikaPods** | environment hosting |
 
-- `dnd-router.json`
-- `dnd-scheduler.json`
+## 📦 Included workflow modules
+
+| File | Purpose |
+|---|---|
+| [`dnd-router.json`](dnd-router.json) | Telegram command and button router |
+| [`dnd-scheduler.json`](dnd-scheduler.json) | periodic reminder and stage dispatch |
+
+## ✅ Outcome
+
+The bot removes the repeated coordination work from the game master and keeps each session more predictable and easier to run.
+
+---
+
+<div align="center">
+
+**Fewer manual reminders. More time for play.**
+
+</div>
