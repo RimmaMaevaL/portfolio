@@ -20,6 +20,12 @@
 
 ---
 
+## New project: Beauty Studio Booking Bot
+
+A Telegram booking bot running daily in a real home beauty studio, built with n8n, Google Calendar, Google Sheets and Groq. See projects/beauty-studio-booking-bot for the case study and workflow export.
+
+---
+
 ## New project: Clinic Booking Bot
 
 A Telegram-based booking and reminder system built with n8n, Google Calendar, Google Sheets and n8n Data Tables. See projects/clinic-booking-bot for the case study and workflow exports.
