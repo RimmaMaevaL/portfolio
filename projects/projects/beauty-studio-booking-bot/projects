@@ -1,0 +1,3835 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## MaYa studio: записи v2\nФорма -> карточка мастеру -> Підтвердити -> календарь + таблица -> подтверждение клиентке.\nКлиентка переносит или отменяет только через админов.\nФорма: https://colossal-giraffe.pikapod.net/form/maya-zapys",
+        "color": 5
+      },
+      "id": "9b0766d3-5643-4d1b-a88e-5b82b34c3c6f",
+      "name": "Sticky Note 558491d3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        1728
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Запис у MaYa home studio",
+        "formDescription": "Манікюр, педикюр і масаж. Залиште заявку, і майстер напише вам, щоб підібрати зручний час.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Імʼя",
+              "placeholder": "Як до вас звертатися",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Телефон",
+              "placeholder": "067 123 45 67",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Telegram (@нік)",
+              "placeholder": "@nickname, щоб майстер міг вам написати"
+            },
+            {
+              "fieldLabel": "Послуга",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Манікюр"
+                  },
+                  {
+                    "option": "Манікюр з нарощуванням"
+                  },
+                  {
+                    "option": "Педикюр"
+                  },
+                  {
+                    "option": "Манікюр + педикюр"
+                  },
+                  {
+                    "option": "Повний масаж"
+                  },
+                  {
+                    "option": "Класичний масаж"
+                  },
+                  {
+                    "option": "Масаж ШВЗ"
+                  },
+                  {
+                    "option": "Масаж стоп"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Коли зручно",
+              "placeholder": "наприклад: будні після 15:00, субота зранку"
+            },
+            {
+              "fieldLabel": "Коментар",
+              "fieldType": "textarea",
+              "placeholder": "Побажання, питання"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Надіслати заявку",
+          "path": "maya-zapys"
+        }
+      },
+      "id": "11dc4fb7-42f7-49ff-9948-6aeae30a4002",
+      "name": "Форма запису",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        2368,
+        1536
+      ],
+      "webhookId": "d79ec33c-49b8-4b39-b5cd-917b2e6bfe28",
+      "notes": "Публичная форма для клиенток. Ссылка: https://colossal-giraffe.pikapod.net/form/maya-zapys (её закрепить в чате). Названия полей (fieldLabel) читает Code-нода «Нова заявка», при переименовании поля поправь и там."
+    },
+    {
+      "parameters": {
+        "jsCode": "const f = $('Форма запису').first().json;\nconst NL = String.fromCharCode(10);\nconst g = (k) => String(f[k] == null ? '' : f[k]).trim();\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst CHAT = { 'Ярослава': '5983686765', 'Марія': '1410749653' };\nconst BOT = 'Vakansii_Dlya_Bot';\nconst TZ = 'Europe/Kiev';\nconst PROCS = [\n  { re: /(манік|маник)[^]*педик|педик[^]*(манік|маник)/, min: 180 },\n  { re: /нарощ/, min: 180 },\n  { re: /масаж/, min: 90 },\n  { re: /педик/, min: 60 },\n  { re: /манік/, min: 120 }\n];\nconst id = Math.random().toString(36).slice(2, 7).toUpperCase();\nconst name = g('Імʼя');\nconst phone = g('Телефон');\nconst tg = g('Telegram (@нік)').replace(/^https?:[/][/]t[.]me[/]/i, '').replace(/^@/, '').trim();\nconst procedure = g('Послуга');\nconst when = g('Коли зручно');\nconst comment = g('Коментар');\nconst note = [when ? 'Коли зручно: ' + when : '', comment].filter(Boolean).join('. ');\nconst low = procedure.toLowerCase();\nconst master = /масаж/.test(low) ? 'Марія' : (/манік|педик|нарощ/.test(low) ? 'Ярослава' : 'Марія');\nconst pm = PROCS.find((x) => x.re.test(low));\nconst dur = pm ? pm.min : 90;\nlet digits = phone.replace(/[^0-9]/g, '');\nif (digits.length === 10 && digits[0] === '0') digits = '38' + digits;\nconst contactUrl = tg ? 'https://t.me/' + tg : (digits ? 'https://t.me/+' + digits : 'https://t.me/');\nconst text = '<b>Нова заявка #' + id + '</b>' + NL + esc(procedure) + ' (' + (dur % 60 ? String(dur / 60).replace('.', ',') : dur / 60) + ' год)' + NL + esc(name) + ', ' + esc(phone) + (tg ? ' · @' + esc(tg) : '') + NL + 'Коли зручно: ' + esc(when || 'не вказала') + (comment ? NL + 'Коментар: ' + esc(comment) : '') + NL + NL + 'Напиши їй, домовтесь про час і натисни «Призначити час».';\nconst row = {\n  'Дата': '', 'Час': '', 'Процедура': procedure, 'Майстер': master, 'Імʼя': name, 'Телефон': phone,\n  'Тривалість хв': dur, 'Нотатка': note, 'Записано': DateTime.now().setZone(TZ).toFormat('dd.LL.yyyy HH:mm'),\n  'Event ID': '', 'ID': id, 'Статус': 'Нова', 'Telegram': tg ? '@' + tg : '', 'Chat ID клієнтки': '', 'Джерело': 'Форма'\n};\nreturn [{ json: { id, name, row, botLink: 'https://t.me/' + BOT + '?start=b_' + id, out: [{ chatId: CHAT[master], text, kind: 'card', id, url: contactUrl }] } }];"
+      },
+      "id": "55707f49-a6a2-43cc-823d-6433e5f7a4b4",
+      "name": "Нова заявка",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        1536
+      ],
+      "notes": "Собирает заявку из формы: даёт ID, решает мастера (маникюр и педикюр Ярославе, массаж Марии), готовит строку для таблицы и карточку мастеру с кнопками. Chat id мастеров и юзернейм бота здесь, в константах CHAT и BOT."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc",
+          "cachedResultName": "MaYa studio · Записи"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата": "={{ $json.row['Дата'] }}",
+            "Час": "={{ $json.row['Час'] }}",
+            "Процедура": "={{ $json.row['Процедура'] }}",
+            "Майстер": "={{ $json.row['Майстер'] }}",
+            "Імʼя": "={{ $json.row['Імʼя'] }}",
+            "Телефон": "={{ $json.row['Телефон'] }}",
+            "Тривалість хв": "={{ $json.row['Тривалість хв'] }}",
+            "Нотатка": "={{ $json.row['Нотатка'] }}",
+            "Записано": "={{ $json.row['Записано'] }}",
+            "Event ID": "={{ $json.row['Event ID'] }}",
+            "ID": "={{ $json.row['ID'] }}",
+            "Статус": "={{ $json.row['Статус'] }}",
+            "Telegram": "={{ $json.row['Telegram'] }}",
+            "Chat ID клієнтки": "={{ $json.row['Chat ID клієнтки'] }}",
+            "Джерело": "={{ $json.row['Джерело'] }}"
+          },
+          "schema": [
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Час",
+              "displayName": "Час",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Процедура",
+              "displayName": "Процедура",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Майстер",
+              "displayName": "Майстер",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Імʼя",
+              "displayName": "Імʼя",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Телефон",
+              "displayName": "Телефон",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Тривалість хв",
+              "displayName": "Тривалість хв",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Нотатка",
+              "displayName": "Нотатка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Записано",
+              "displayName": "Записано",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Event ID",
+              "displayName": "Event ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telegram",
+              "displayName": "Telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat ID клієнтки",
+              "displayName": "Chat ID клієнтки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Джерело",
+              "displayName": "Джерело",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "matchingColumns": []
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "07562a82-87fc-42e1-afa1-ff31db0042be",
+      "name": "Записати заявку",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2816,
+        1728
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Добавляет заявку строкой со статусом «Нова» в таблицу «MaYa studio · Записи». Заголовки колонок в таблице должны совпадать с названиями тут. Если таблица упадёт, карточка мастеру всё равно уйдёт."
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "showText",
+        "responseText": "=<div style=\"font-family:sans-serif;text-align:center;padding:24px\"><h2>Дякуємо, заявку отримали!</h2><p>Майстер напише вам, щоб підібрати зручний час.</p><p>Щоб отримати підтвердження і нагадування в Telegram, натисніть кнопку, а потім «Start» у боті.</p><p><a href=\"{{ $(\"Нова заявка\").first().json.botLink }}\" style=\"display:inline-block;padding:14px 22px;background:#7a4a6e;color:#fff;border-radius:10px;text-decoration:none\">Отримати підтвердження</a></p></div>"
+      },
+      "id": "1382095b-6314-4532-9d12-33f5dbf3ac0e",
+      "name": "Сторінка подяки",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        3040,
+        1728
+      ],
+      "webhookId": "29ed6223-9f67-40b6-b3c7-93b4aa20c95d",
+      "notes": "Последняя страница формы. Кнопка ведёт в бота с кодом заявки (/start b_ID): так бот узнаёт chat id клиентки и сможет прислать ей подтверждение."
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "out",
+        "options": {}
+      },
+      "id": "eae96711-890c-492e-9886-e5d2a676f5a6",
+      "name": "Розгорнути повідомлення",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        432
+      ],
+      "notes": "Каждая ветка складывает сообщения в массив out. Здесь он разворачивается в отдельные сообщения, дальше Switch выбирает, с какими кнопками отправить."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "card"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "client"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "req"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "force"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.kind }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "rec"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Без кнопок"
+        }
+      },
+      "id": "a7e5475e-882a-4d8c-9211-a74c2a0e3bb2",
+      "name": "Тип повідомлення",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3040,
+        384
+      ],
+      "notes": "card: карточка мастеру. client: клиентке с кнопками перенос/отмена. req: просьба клиентки админам. force: вопрос про время (отвечать reply). Остальное без кнопок."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Призначити час",
+                    "additionalFields": {
+                      "callback_data": "=rt:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Написати",
+                    "additionalFields": {
+                      "url": "={{ $json.url }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Відхилити",
+                    "additionalFields": {
+                      "callback_data": "=no:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Нотатка",
+                    "additionalFields": {
+                      "callback_data": "=nt:{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "0a449199-8a76-429a-a3f5-20a1e9551cad",
+      "name": "Картка майстру",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3264,
+        240
+      ],
+      "webhookId": "adc2893e-4457-42a0-b020-7f691365ed83",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Карточка новой заявки с кнопками. callback_data вида ok:ID, читает «Розібрати апдейт». «Написати» открывает личку клиентки по нику или номеру."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Перенести",
+                    "additionalFields": {
+                      "callback_data": "=cmv:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Скасувати",
+                    "additionalFields": {
+                      "callback_data": "=ccl:{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "2f270bf8-a38a-4f77-bcaf-60f51bca7b2d",
+      "name": "Клієнтці з кнопками",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3264,
+        432
+      ],
+      "webhookId": "6767dd74-dc32-4388-8534-3283cd92440b",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Подтверждение клиентке. Кнопки не меняют запись сами, а отправляют просьбу обоим админам."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Інший час",
+                    "additionalFields": {
+                      "callback_data": "=rt:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Скасувати запис",
+                    "additionalFields": {
+                      "callback_data": "=ax:{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Написати клієнтці",
+                    "additionalFields": {
+                      "url": "={{ $json.url }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "8c5a0cb0-3209-4ddd-beeb-9cfb7ac3dc47",
+      "name": "Запит адмінам",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3264,
+        624
+      ],
+      "webhookId": "b4185a08-503d-4753-a4f6-7058c6b721dd",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Клиентка просит перенос или отмену. Админы обсуждают, потом «Інший час» (бот спросит новое время) или «Скасувати запис»."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "forceReply",
+        "forceReply": {
+          "force_reply": true
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "0e4e8c3d-2828-4961-b449-362d69d5f1a0",
+      "name": "Питання про час",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3264,
+        816
+      ],
+      "webhookId": "5c5b211b-addd-4345-9c2c-dea7e0d6d6f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Сообщение с force reply: админ отвечает на него новым временем. В тексте обязательно #ID и «новий час», по ним «Розібрати апдейт» понимает, к какой заявке ответ."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "681be01c-2c6c-43ac-9ced-085286b9dd55",
+      "name": "Повідомлення без кнопок",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3264,
+        1008
+      ],
+      "webhookId": "0332c18a-78f9-43aa-ac50-234d70ee5d3c",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Все остальные сообщения: «записано», «відхилено», ответы клиентке."
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "id": "c441f800-bca9-4ee9-960e-c1df4fc967a6",
+      "name": "Нове повідомлення",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        1120
+      ],
+      "webhookId": "117283dd-ad47-4304-97d3-dde05085496c",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Ловит сообщения и нажатия кнопок в боте. Фильтра по user id нет, потому что пишут и клиентки: кто админ, решает нода «Розібрати апдейт»."
+    },
+    {
+      "parameters": {
+        "jsCode": "const u = $input.first().json;\nconst ADMINS = { '1410749653': 'Марія', '5983686765': 'Ярослава' };\nconst MARIA = '1410749653';\nlet route = 'ignore', act = '', id = '', fromId = '', chatId = '', queryId = '', text = '';\nif (u.callback_query) {\n  const cq = u.callback_query;\n  fromId = String(cq.from && cq.from.id);\n  chatId = String((cq.message && cq.message.chat && cq.message.chat.id) || fromId);\n  queryId = String(cq.id);\n  const parts = String(cq.data || '').split(':');\n  act = parts[0] || '';\n  id = String(parts[1] || '').toUpperCase();\n  route = 'action';\n} else if (u.message) {\n  const msg = u.message;\n  fromId = String(msg.from && msg.from.id);\n  chatId = String(msg.chat && msg.chat.id);\n  text = String(msg.text || '').trim();\n  if (!msg.chat || msg.chat.type !== 'private') {\n    route = 'ignore';\n  } else if (ADMINS[fromId]) {\n    const cm = text.match(/^[/]n_([A-Za-z0-9]{4,8})/);\n    const dn = text.match(/^[/]done_(NT[A-Za-z0-9]{4})/i);\n    const rt = String((msg.reply_to_message && msg.reply_to_message.text) || '');\n    const low = rt.toLowerCase();\n    const nm = rt.match(/#(NT[A-Z0-9]{4})(?![A-Z0-9])/);\n    const m = rt.match(/#([A-Z0-9]{4,6})/);\n    if (fromId === MARIA && nm && text) { route = 'mynote'; act = 'nsnooze'; id = nm[1]; }\n    else if (fromId === MARIA && text.indexOf('!') === 0) { route = 'mynote'; act = 'nadd'; }\n    else if (fromId === MARIA && /^[/]notes/i.test(text)) { route = 'mynote'; act = 'nlist'; }\n    else if (fromId === MARIA && dn) { route = 'mynote'; act = 'ndone'; id = dn[1].toUpperCase(); }\n    else if (cm) { route = 'action'; act = 'card'; id = cm[1].toUpperCase(); }\n    else if (m && text && low.indexOf('замінити нотатку') !== -1) { route = 'action'; act = 'notereplace'; id = m[1]; }\n    else if (m && text && low.indexOf('новий телефон') !== -1) { route = 'action'; act = 'phone'; id = m[1]; }\n    else if (m && low.indexOf('новий час') !== -1) { route = 'action'; act = 'time'; id = m[1]; }\n    else if (m && text) { route = 'action'; act = 'note'; id = m[1]; }\n    else route = 'admin';\n  } else {\n    const s = text.match(/^[/]start b_([A-Za-z0-9]+)/);\n    if (s) { route = 'action'; act = 'bind'; id = s[1].toUpperCase(); }\n    else route = 'client';\n  }\n}\nreturn [{ json: Object.assign({}, u, { route: route, act: act, id: id, fromId: fromId, chatId: chatId, queryId: queryId, text: text, isAdmin: !!ADMINS[fromId], adminName: ADMINS[fromId] || '' }) }];"
+      },
+      "id": "2ba3af33-73ea-4e4c-aacc-93af9bb38bee",
+      "name": "Розібрати апдейт",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        1120
+      ],
+      "notes": "Определяет, что пришло: кнопка (callback) -> action; ответ админа на вопрос про время -> action time; /start b_ID от клиентки -> action bind; любое другое сообщение админа -> старая логика; клиентки -> подсказка с формой. Список админов в ADMINS."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "action"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "admin"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "client"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "mynote"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e181dda4-2eb6-49e3-918d-aa131e62f5b0",
+      "name": "Куди?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        880
+      ],
+      "notes": "action: кнопки, ответ про время, привязка клиентки. admin: команды и ручная запись текстом. client: любой другой текст от клиентки. ignore (группы и прочее) никуда не идёт."
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc",
+          "cachedResultName": "MaYa studio · Записи"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "options": {}
+      },
+      "id": "c976f5be-ecaf-447b-9c7e-e52f8f5108b0",
+      "name": "Усі записи",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        256
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Читает всю таблицу, чтобы найти заявку по ID. alwaysOutputData включён, чтобы при пустой таблице всё равно ответить «не знайшов»."
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = $('Розібрати апдейт').first().json;\nconst NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst SLOT = 150;\nconst FORM = 'https://colossal-giraffe.pikapod.net/form/maya-zapys';\nconst ADM = { 'Марія': '1410749653', 'Ярослава': '5983686765' };\nconst COLS = ['Дата','Час','Процедура','Майстер','Імʼя','Телефон','Тривалість хв','Нотатка','Записано','Event ID','ID','Статус','Telegram','Chat ID клієнтки','Джерело','Нагадування за день','Нагадування за годину','Нотатка майстра'];\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst now = DateTime.now().setZone(TZ);\nconst id = p.id;\nconst out = [];\nconst send = function (chatId, text, kind, url) { if (chatId) out.push({ chatId: String(chatId), text: text, kind: kind || 'plain', id: id, url: url || 'https://t.me/' }); };\nconst finish = function (extra) { return [{ json: Object.assign({ op: 'none', id: id, out: out }, extra || {}) }]; };\nconst rows = $input.all().map(function (i) { return i.json; }).filter(function (r) { return r && r['ID']; });\nconst found = rows.find(function (r) { return String(r['ID']).trim().toUpperCase() === id; });\nif (!found) {\n  send(p.chatId, p.isAdmin ? 'Заявку #' + esc(id) + ' не знайшов у таблиці.' : 'Не знайшли вашу заявку. Заповніть, будь ласка, форму ще раз: ' + FORM);\n  return finish();\n}\nconst row = {};\nCOLS.forEach(function (c) { row[c] = found[c] == null ? '' : found[c]; });\nconst normDate = function (v) {\n  if (typeof v === 'number') return DateTime.fromObject({ year: 1899, month: 12, day: 30 }).plus({ days: Math.floor(v) }).toISODate();\n  const s = String(v).trim();\n  const m = s.match(/^([0-9]{1,2})[.]([0-9]{1,2})[.]([0-9]{4})$/);\n  return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : s;\n};\nconst normTime = function (v) {\n  if (typeof v === 'number') { const t = Math.round(v * 1440); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); }\n  const m = String(v).match(/([0-9]{1,2})[:.]([0-9]{2})/);\n  return m ? m[1].padStart(2, '0') + ':' + m[2] : String(v).trim();\n};\nrow['Дата'] = normDate(row['Дата']);\nrow['Час'] = normTime(row['Час']);\nconst master = ADM[row['Майстер']] ? row['Майстер'] : 'Марія';\nconst masterChat = ADM[master];\nconst clientChat = String(row['Chat ID клієнтки'] || '').trim();\nconst status = String(row['Статус'] || '');\nconst tg = String(row['Telegram'] || '').replace(/^@/, '').trim();\nlet digits = String(row['Телефон'] || '').replace(/[^0-9]/g, '');\nif (digits.length === 10 && digits[0] === '0') digits = '38' + digits;\nconst contactUrl = tg ? 'https://t.me/' + tg : (digits ? 'https://t.me/+' + digits : 'https://t.me/');\nconst who = esc(row['Процедура']) + ', ' + esc(row['Імʼя']);\nconst label = function (dt) { return dt.setLocale('uk').toFormat('d MMMM, cccc, HH:mm'); };\nconst startOf = function () { const s = DateTime.fromISO(row['Дата'] + 'T' + row['Час'], { zone: TZ }); return s.isValid ? s : null; };\nconst buildDesc = function () {\n  return 'Телефон: ' + (row['Телефон'] || '—') + NL + 'Майстер: ' + master + NL + 'Тривалість: ' + SLOT + ' хв' + (tg ? NL + 'Telegram: @' + tg : '') + (row['Нотатка'] ? NL + 'Нотатка: ' + row['Нотатка'] : '') + (row['Нотатка майстра'] ? NL + 'Нотатка майстра: ' + row['Нотатка майстра'] : '') + NL + 'ID: ' + id + NL + 'Записано через бота';\n};\nconst askTime = function (chatId, reason) {\n  send(chatId, (reason ? reason + NL + NL : '') + '#' + id + ' · ' + who + NL + 'Напиши новий час відповіддю на це повідомлення, наприклад: 25.10 13:30 або завтра 16:00', 'force');\n};\nconst parseWhen = function (txt, fallbackDate) {\n  const t = String(txt || '').toLowerCase();\n  let date = null;\n  let rest = t;\n  const dm = t.match(/([0-9]{1,2})[.]([0-9]{1,2})(?:[.]([0-9]{2,4}))?/);\n  if (dm) {\n    let y = dm[3] ? Number(dm[3]) : now.year;\n    if (y < 100) y += 2000;\n    let d = DateTime.fromObject({ year: y, month: Number(dm[2]), day: Number(dm[1]) }, { zone: TZ });\n    if (d.isValid) {\n      if (!dm[3] && d < now.startOf('day')) d = d.plus({ years: 1 });\n      date = d;\n      rest = t.replace(dm[0], ' ');\n    }\n  }\n  const words = rest.split(/[^a-zа-яіїєґ'’ʼ]+/i).filter(Boolean).map(function (w) { return w.replace(/['’ʼ]/g, ''); });\n  const today = now.startOf('day');\n  if (!date) {\n    if (words.indexOf('сьогодні') !== -1 || words.indexOf('сегодня') !== -1) date = today;\n    else if (words.indexOf('післязавтра') !== -1 || words.indexOf('послезавтра') !== -1) date = today.plus({ days: 2 });\n    else if (words.indexOf('завтра') !== -1) date = today.plus({ days: 1 });\n    else {\n      const WD = [['пн','понеділок','понедельник'],['вт','вівторок','вторник'],['ср','середа','середу','среда','среду'],['чт','четвер','четверг'],['пт','пятниця','пятницю','пятница','пятницу'],['сб','субота','суботу','суббота','субботу'],['нд','вс','неділя','неділю','воскресенье']];\n      for (let i = 0; i < 7; i++) {\n        if (words.some(function (w) { return WD[i].indexOf(w) !== -1; })) {\n          let diff = (i + 1 - now.weekday + 7) % 7;\n          if (diff === 0) diff = 7;\n          date = today.plus({ days: diff });\n          break;\n        }\n      }\n    }\n  }\n  if (!date && fallbackDate) { const f = DateTime.fromISO(String(fallbackDate), { zone: TZ }); if (f.isValid) date = f.startOf('day'); }\n  const tm = rest.match(/([0-9]{1,2})(?:[:.]([0-9]{2}))?/);\n  if (!date || !tm) return null;\n  let h = Number(tm[1]);\n  const mi = tm[2] ? Number(tm[2]) : 0;\n  if (h >= 1 && h <= 8) h += 12;\n  if (h > 23 || mi > 59) return null;\n  return date.set({ hour: h, minute: mi, second: 0, millisecond: 0 });\n};\nconst scheduleOp = function (start, newStatus) {\n  const end = start.plus({ minutes: SLOT });\n  row['Нагадування за день'] = '';\n  row['Нагадування за годину'] = '';\n  return finish({ op: 'schedule', row: row, start: start.toISO(), end: end.toISO(), whenLabel: label(start) + '–' + end.toFormat('HH:mm'), date: start.toISODate(), time: start.toFormat('HH:mm'), eventId: String(row['Event ID'] || ''), newStatus: newStatus, master: master, masterChat: masterChat, adminChat: p.chatId, clientChat: clientChat, who: who, summary: row['Процедура'] + ' · ' + row['Імʼя'], description: buildDesc(), contactUrl: contactUrl });\n};\nconst adminOnly = ['ok', 'rt', 'time', 'no', 'ax', 'nt', 'note', 'card', 'nr', 'nc', 'np', 'notereplace', 'phone'];\nif (adminOnly.indexOf(p.act) !== -1 && !p.isAdmin) return finish();\nif ((p.act === 'cmv' || p.act === 'ccl') && !p.isAdmin && p.chatId !== clientChat) return finish();\nconst closed = status === 'Скасовано' || status === 'Відхилено';\nconst notesOf = function (v) { return String(v || '').split('|').map(function (x) { return x.trim().replace(/^[0-9]{1,2}[.][0-9]{1,2}: */, '').trim(); }).filter(Boolean); };\nconst clean = function (v) { return String(v || '').split(String.fromCharCode(13)).join('').split(NL).map(function (x) { return x.trim(); }).filter(Boolean).join('; ').split('|').join('/').trim(); };\nconst card = function () {\n  const s = startOf();\n  const notes = notesOf(row['Нотатка майстра']);\n  return '<b>#' + id + ' · ' + esc(row['Процедура']) + '</b>' + NL +\n    'Клієнтка: ' + esc(row['Імʼя']) + NL +\n    'Коли: ' + (s ? esc(label(s)) : 'час не призначено') + NL +\n    'Майстер: ' + esc(master) + NL +\n    'Телефон: ' + esc(row['Телефон'] || '—') + (tg ? ' · @' + esc(tg) : '') + NL +\n    'Статус: ' + esc(status || '—') +\n    (row['Нотатка'] ? NL + 'Від клієнтки: ' + esc(row['Нотатка']) : '') + NL + NL +\n    '<b>📝 Нотатка</b>' + NL + (notes.length ? notes.map(function (n) { return '• ' + esc(n); }).join(NL) : 'порожньо');\n};\nconst saveShow = function (msg) {\n  send(p.chatId, msg + NL + NL + card(), 'rec', contactUrl);\n  const evId = String(row['Event ID'] || '');\n  if (evId && !closed) return finish({ op: 'notecal', row: row, eventId: evId, description: buildDesc() });\n  return finish({ op: 'sheet', row: row });\n};\nif (p.act === 'card') { send(p.chatId, card(), 'rec', contactUrl); return finish(); }\nif (p.act === 'nt') {\n  send(p.chatId, 'Дописати нотатку #' + id + ' · ' + who + NL + 'Напиши текст відповіддю на це повідомлення, він додасться до старої. Клієнтка нотатку не бачить.', 'force');\n  return finish();\n}\nif (p.act === 'nr') {\n  const cur = notesOf(row['Нотатка майстра']);\n  send(p.chatId, 'Замінити нотатку #' + id + ' · ' + who + NL + 'Зараз: ' + (cur.length ? esc(cur.join('; ')) : 'порожньо') + NL + NL + 'Напиши нову нотатку відповіддю на це повідомлення, стара зітреться.', 'force');\n  return finish();\n}\nif (p.act === 'np') {\n  send(p.chatId, 'Новий телефон #' + id + ' · ' + who + NL + 'Зараз: ' + esc(row['Телефон'] || '—') + NL + NL + 'Напиши номер відповіддю на це повідомлення.', 'force');\n  return finish();\n}\nif (p.act === 'nc') { row['Нотатка майстра'] = ''; return saveShow('Нотатку очищено ✓'); }\nif (p.act === 'note' || p.act === 'notereplace' || p.act === 'phone') {\n  const add = clean(p.text);\n  if (!add) return finish();\n  if (p.act === 'phone') { row['Телефон'] = add; return saveShow('Телефон оновлено ✓'); }\n  if (p.act === 'notereplace') { row['Нотатка майстра'] = add; return saveShow('Нотатку замінено ✓'); }\n  const curRaw = String(row['Нотатка майстра'] || '').trim();\n  row['Нотатка майстра'] = curRaw ? curRaw + ' | ' + add : add;\n  return saveShow('Додано до нотатки ✓');\n}\nif (p.act === 'bind') {\n  row['Chat ID клієнтки'] = p.chatId;\n  const s = startOf();\n  if ((status === 'Підтверджено' || status === 'Перенесено') && s) send(p.chatId, 'Ви записані: ' + who + NL + label(s) + NL + NL + 'Якщо потрібно перенести чи скасувати, натисніть кнопку нижче.', 'client');\n  else send(p.chatId, 'Дякуємо, ' + esc(row['Імʼя']) + '! Заявку отримали. Майстер підтвердить запис, і повідомлення прийде сюди.');\n  return finish({ op: 'sheet', row: row });\n}\nif (p.act === 'ok') {\n  if (closed) { send(p.chatId, '#' + id + ' вже має статус «' + esc(status) + '».'); return finish(); }\n  const s = startOf();\n  if (!s) { askTime(p.chatId, 'У заявці немає часу.'); return finish(); }\n  if (s < now) { askTime(p.chatId, 'Обраний час уже минув.'); return finish(); }\n  return scheduleOp(s, (status === 'Перенесено') ? status : 'Підтверджено');\n}\nif (p.act === 'rt') { askTime(p.chatId, ''); return finish(); }\nif (p.act === 'time') {\n  if (closed) { send(p.chatId, '#' + id + ' вже має статус «' + esc(status) + '».'); return finish(); }\n  const s = parseWhen(p.text, row['Дата']);\n  if (!s) { askTime(p.chatId, 'Не зрозумів дату або час.'); return finish(); }\n  if (s < now) { askTime(p.chatId, 'Цей час уже минув.'); return finish(); }\n  return scheduleOp(s, row['Event ID'] ? 'Перенесено' : 'Підтверджено');\n}\nif (p.act === 'no' || p.act === 'ax') {\n  const evId = String(row['Event ID'] || '');\n  const word = p.act === 'no' ? 'Відхилено' : 'Скасовано';\n  row['Статус'] = word;\n  row['Event ID'] = '';\n  send(p.chatId, word + ': #' + id + ' · ' + who);\n  if (p.chatId !== masterChat) send(masterChat, word + ': #' + id + ' · ' + who + ' (' + esc(p.adminName) + ')');\n  if (clientChat) send(clientChat, p.act === 'no' ? 'На жаль, на цей час записати не вийде. Майстер напише вам, щоб підібрати інше вікно.' : 'Ваш запис скасовано: ' + who + '.');\n  return finish({ op: evId ? 'cancel' : 'sheet', row: row, eventId: evId });\n}\nif (p.act === 'cmv' || p.act === 'ccl') {\n  if (closed) { send(p.chatId, 'Цей запис уже неактивний.'); return finish(); }\n  const s = startOf();\n  const when = s ? label(s) : esc(row['Дата'] + ' ' + row['Час']);\n  const isMove = p.act === 'cmv';\n  const txt = (isMove ? 'Клієнтка просить перенести запис' : 'Клієнтка просить скасувати запис') + NL + '#' + id + ' · ' + who + NL + when + NL + NL + 'Обговоріть і натисніть кнопку нижче.';\n  send(ADM['Марія'], txt, 'req', contactUrl);\n  send(ADM['Ярослава'], txt, 'req', contactUrl);\n  send(p.chatId, 'Передали майстру. Вам напишуть, щоб ' + (isMove ? 'підібрати новий час.' : 'підтвердити скасування.'));\n  return finish();\n}\nreturn finish();"
+      },
+      "id": "d6560906-4dac-48db-909e-c9768bb4f808",
+      "name": "Обробити дію",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        256
+      ],
+      "notes": "Мозг бота. По действию (ok, rt, time, no, ax от админов; cmv, ccl, bind от клиенток) находит заявку по ID и решает: op=schedule (поставить или перенести в календарь), sheet (только обновить строку), cancel (удалить событие и обновить строку), none (только сообщения). Сообщения кладёт в out. Длительность блока SLOT = 180 минут."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.message.text || \"\").trim() }}",
+                    "operator": {
+                      "operation": "regex",
+                      "type": "string"
+                    },
+                    "rightValue": "^(/(start|help|menu)|Меню$)"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.message.text || \"\").trim() }}",
+                    "operator": {
+                      "operation": "regex",
+                      "type": "string"
+                    },
+                    "rightValue": "^(/(today|tomorrow|week|all)|Сьогодні$|Завтра$|Тиждень$|Усі записи$)"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.message.text || \"\").trim() }}",
+                    "operator": {
+                      "operation": "regex",
+                      "type": "string"
+                    },
+                    "rightValue": "^(/free|[Вв]ільн|[Сс]вобод)"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.message.text || \"\").trim() }}",
+                    "operator": {
+                      "operation": "regex",
+                      "type": "string"
+                    },
+                    "rightValue": "^(/new|Нові заявки$)"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Запис"
+        }
+      },
+      "id": "60057f4c-9d4e-4507-be3b-4469dc421b21",
+      "name": "Команда чи запис?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        960
+      ],
+      "notes": "Только для админов. /start и /help -> подсказка; /today /tomorrow /week -> расписание; любой другой текст -> ручная запись через AI."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "<b>Адмін-панель MaYa studio</b>\n🟣 Марія, 🟢 Ярослава\n\nКнопки внизу або команди:\n/today: записи на сьогодні\n/tomorrow: на завтра\n/week: на 7 днів\n/all: усі записи на 60 днів\n/free: вільний час на тиждень\n/new: нові заявки без часу\n/menu: показати і закріпити це меню\n\n<b>Вільний час під процедуру</b>\nНапиши «вільні» і процедуру: <i>вільні педикюр</i>, <i>вільні нарощування</i>, <i>вільні масаж</i>, <i>вільні манікюр 3 год</i>.\n\n<b>Як записати з форми</b>\nКартка заявки → «Написати» → домовились → «Призначити час» → відповідь (Reply) датою і часом, наприклад <i>25.10 14:00</i>.\n\n<b>Тривалість</b>\nПедикюр 1 год, манікюр 2 год, нарощування і манікюр + педикюр 3 год, масаж 1,5 год. Якщо інакше, допиши після часу: <i>25.10 14:00 3 год</i>.\n\n<b>Вручну</b>\nОдним повідомленням: <i>завтра в 13:30 манікюр Оля 0671234567</i>\n\n<b>Картка запису</b>\nПід кожним записом у розкладі є /n_ID. Тиснеш, і відкривається картка: дописати або замінити нотатку, очистити її, змінити телефон чи час.\n\n<b>Нотатка до запису</b>\nReply на будь-яке повідомлення бота з #ID. Клієнтка її не бачить.\n\n<b>Особисті нотатки (тільки Марія)</b>\nПовідомлення з «!» на початку, /notes список.\n\nЩовечора о 21:00 надсилаю розклад на завтра.",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Сьогодні",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "Завтра",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Тиждень",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "Усі записи",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Вільні вікна",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "Нові заявки",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {
+          "resize_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "2b73a9b0-2871-44db-9921-9da34a39bca6",
+      "name": "Відповісти: підказка",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        688
+      ],
+      "webhookId": "79726fa9-951c-4f36-a2f8-b94ba80916bd",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Подсказка для админов на /start и /help."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $input.first().json.message;\nconst text = ((msg && msg.text) || '').trim().toLowerCase();\nconst chatId = (msg && msg.chat && msg.chat.id) || 1410749653;\nconst now = DateTime.now().setZone('Europe/Kiev');\nconst fmt = (d) => d.setLocale('uk').toFormat('d MMMM');\nlet from, to, label, multi = false;\nif (text.startsWith('/today') || text === 'сьогодні') {\n  from = now.startOf('day'); to = from.endOf('day'); label = 'Сьогодні';\n} else if (text.startsWith('/week') || text === 'тиждень') {\n  from = now.startOf('day'); to = from.plus({ days: 7 }).endOf('day'); label = 'Найближчі 7 днів'; multi = true;\n} else if (text.startsWith('/all') || text === 'усі записи') {\n  from = now.startOf('day'); to = from.plus({ days: 60 }).endOf('day'); label = 'Усі записи'; multi = true;\n} else {\n  from = now.plus({ days: 1 }).startOf('day'); to = from.endOf('day'); label = 'Завтра';\n}\nconst fromLabel = multi ? fmt(from) + ' – ' + fmt(to) : from.setLocale('uk').toFormat('d MMMM, cccc');\nreturn [{ json: { chatId, label, multi, fromLabel, timeMin: from.toISO(), timeMax: to.toISO() } }];"
+      },
+      "id": "329a2054-a329-4b50-9d03-3692a35e6b7a",
+      "name": "Діапазон дат",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        1008
+      ],
+      "notes": "Считает период: /today, /week или завтра (по умолчанию и для вечерней рассылки). chatId из сообщения, для рассылки по таймеру id Марии."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.timeMin }}",
+        "timeMax": "={{ $json.timeMax }}",
+        "options": {
+          "orderBy": "startTime",
+          "recurringEventHandling": "expand"
+        }
+      },
+      "id": "630d553d-516e-4f6a-82b7-ab3dbaef2035",
+      "name": "Записи за період",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        1008
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "События общего календаря за период. alwaysOutputData, чтобы пустой день дал «записів немає»."
+    },
+    {
+      "parameters": {
+        "jsCode": "const r = $('Діапазон дат').first().json;\nconst NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst field = (desc, key) => { const line = String(desc || '').split(NL).find((l) => l.indexOf(key) === 0); return line ? line.slice(key.length).trim() : ''; };\nconst MARK = { 'Марія': '🟣', 'Ярослава': '🟢' };\nconst plural = (n) => { const a = n % 10, b = n % 100; if (a === 1 && b !== 11) return 'запис'; if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return 'записи'; return 'записів'; };\nconst notesOf = (v) => String(v || '').split('|').map((x) => x.trim().replace(/^[0-9]{1,2}[.][0-9]{1,2}: */, '').trim()).filter(Boolean);\nconst cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);\nconst events = $input.all().map((i) => i.json).filter((e) => e && e.id && e.status !== 'cancelled' && e.start && e.start.dateTime && String(e.description || '').indexOf('Записано через бота') !== -1);\nevents.sort((a, b) => a.start.dateTime.localeCompare(b.start.dateTime));\nconst head = '<b>' + esc(r.label) + '</b> · ' + esc(r.fromLabel);\nif (!events.length) return [{ json: { chatId: r.chatId, text: head + NL + NL + 'Записів немає' } }];\nconst blocks = [];\nlet lastDay = '';\nevents.forEach((e) => {\n  const s = DateTime.fromISO(e.start.dateTime).setZone(TZ);\n  const en = DateTime.fromISO(e.end.dateTime).setZone(TZ);\n  const parts = String(e.summary || '').split(' · ');\n  const proc = parts[0] || '';\n  const client = parts.slice(1).join(' · ');\n  const phone = field(e.description, 'Телефон:');\n  const master = field(e.description, 'Майстер:');\n  const id = field(e.description, 'ID:');\n  const notes = notesOf(field(e.description, 'Нотатка майстра:'));\n  const lines = [];\n  if (r.multi) {\n    const day = s.setLocale('uk').toFormat('cccc, d MMMM');\n    if (day !== lastDay) { lines.push('<b>📅 ' + esc(cap(day)) + '</b>'); lastDay = day; }\n  }\n  lines.push((MARK[master] || '⚪️') + ' <b>' + s.toFormat('HH:mm') + '–' + en.toFormat('HH:mm') + '</b> · ' + esc(master || 'майстер?'));\n  lines.push(esc(proc) + (client ? ', ' + esc(client) : ''));\n  if (phone && phone !== '—') lines.push('📞 ' + esc(phone));\n  notes.forEach((n) => lines.push('📝 ' + esc(n)));\n  if (id) lines.push('✏️ /n_' + esc(id));\n  blocks.push(lines.join(NL));\n});\nconst top = head + ' · ' + events.length + ' ' + plural(events.length);\nlet text = top + NL + NL + blocks.join(NL + NL);\nif (text.length > 3900) {\n  let shown = blocks.length;\n  while (shown > 0 && (top + NL + NL + blocks.slice(0, shown).join(NL + NL)).length > 3700) shown--;\n  text = top + NL + NL + blocks.slice(0, shown).join(NL + NL) + NL + NL + '…і ще ' + (blocks.length - shown) + '. Повний список у таблиці.';\n}\nreturn [{ json: { chatId: r.chatId, text } }];"
+      },
+      "id": "b8d27ba7-2248-4669-88f6-b6853bf3ccea",
+      "name": "Скласти розклад",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        1008
+      ],
+      "notes": "Текст расписания: время, процедура, имя, мастер, телефон. Берёт только события бота."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "b1333a39-c1e1-4383-abf5-f5a7764c9df6",
+      "name": "Надіслати розклад",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        1008
+      ],
+      "webhookId": "70668dbb-9be0-49fe-8c05-f36dc3856475",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Отправляет расписание, формат HTML."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Current date and time in Kyiv: {{ $now.setZone(\"Europe/Kiev\").toFormat(\"yyyy-LL-dd cccc HH:mm\") }}\nMessage: {{ $json.message.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You extract one booking for a manicure and massage studio in Kharkiv from a short message written in Russian or Ukrainian.\nReturn ONLY a JSON object, no markdown, no comments:\n{\"date\": \"YYYY-MM-DD or null\", \"time\": \"HH:mm or null\", \"procedure\": \"one of: Манікюр, Педикюр, Повний масаж, Класичний масаж, Масаж ШВЗ, Масаж стоп, or null\", \"name\": \"client name or null\", \"phone\": \"phone as written, or null\", \"note\": \"any other useful detail, or empty string\"}\nRules:\n- Resolve relative dates (сегодня/сьогодні, завтра, послезавтра/післязавтра, weekday names) from the current date. A weekday means the nearest upcoming one. A date without a year means the nearest future date.\n- A time like \"в 3\" or \"о 5\" with an hour from 1 to 8 and no am/pm means afternoon (15:00, 17:00).\n- Synonyms: маник, маникюр, ногти, нігті, манік -> Манікюр; педик, педикюр -> Педикюр; полный, общий, весь, повний, загальний массаж -> Повний масаж; классика, класичний, классический -> Класичний масаж; швз, шея, шия, воротник, плечи -> Масаж ШВЗ; стопы, стопи, ступни -> Масаж стоп.\n- Never invent data. If something is missing, use null."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "7de90733-61fe-48ba-a999-686a1af21e78",
+      "name": "AI: розібрати запис",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        896,
+        1344
+      ],
+      "notes": "Ручная запись админом: Groq вытаскивает дату, время, процедуру, имя, телефон. JSON разбирается в следующей Code-ноде (Structured Output Parser с Groq не работает)."
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {
+          "maxTokensToSample": 600,
+          "temperature": 0
+        }
+      },
+      "id": "6fe21ecf-4709-4c98-9738-c6403347d811",
+      "name": "Groq",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        976,
+        1568
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "cYfnKghYCT9siyHL",
+          "name": "Groq account"
+        }
+      },
+      "notes": "openai/gpt-oss-120b, temperature 0."
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('Нове повідомлення').first().json.message;\nconst chatId = src.chat.id;\nconst NL = String.fromCharCode(10);\nconst FENCE = String.fromCharCode(96).repeat(3);\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst DUR = { 'Манікюр': 120, 'Педикюр': 60, 'Повний масаж': 90, 'Класичний масаж': 90, 'Масаж ШВЗ': 90, 'Масаж стоп': 90 };\nconst MASTER = { 'Манікюр': 'Ярослава', 'Педикюр': 'Ярослава' };\nlet raw = String($input.first().json.text || '').trim();\nif (raw.indexOf(FENCE) === 0) raw = raw.slice(3).replace(/^json/i, '');\nif (raw.slice(-3) === FENCE) raw = raw.slice(0, -3);\nraw = raw.trim();\nlet d;\ntry {\n  d = JSON.parse(raw);\n} catch (e) {\n  console.error(e.message);\n  return [{ json: { ok: false, chatId: chatId, reply: 'Не зміг розібрати запис. Спробуй так:' + NL + '<i>завтра в 14 манікюр Оля 0671234567</i>' } }];\n}\nconst missing = [];\nif (!d.date) missing.push('дату');\nif (!d.time) missing.push('час');\nif (!d.procedure || !DUR[d.procedure]) missing.push('процедуру');\nif (!d.name) missing.push('імʼя');\nif (missing.length) return [{ json: { ok: false, chatId: chatId, reply: 'Не вистачає: ' + missing.join(', ') + '.' + NL + 'Напиши запис ще раз одним повідомленням.' } }];\nconst start = DateTime.fromISO(d.date + 'T' + d.time, { zone: 'Europe/Kiev' });\nif (!start.isValid) return [{ json: { ok: false, chatId: chatId, reply: 'Дата або час виглядають дивно. Напиши, наприклад: 25.10 о 14:00.' } }];\nif (start < DateTime.now().setZone('Europe/Kiev')) return [{ json: { ok: false, chatId: chatId, reply: start.toFormat('dd.LL HH:mm') + ' вже минуло. Перевір дату.' } }];\nconst srcText = String(src.text || '').toLowerCase();\nconst dmm = srcText.match(/([0-9]+(?:[.,][0-9]+)?)\\s*(год|г\\b|h\\b|час)/);\nlet duration = DUR[d.procedure];\nif (/нарощ|наращ/.test(srcText)) duration = 180;\nif (dmm) { const h = Number(dmm[1].replace(',', '.')); if (h > 0 && h <= 6) duration = Math.round(h * 60); }\nconst end = start.plus({ minutes: duration });\nconst phone = d.phone ? String(d.phone).trim() : '—';\nconst master = MASTER[d.procedure] || 'Марія';\nconst whenLabel = start.setLocale('uk').toFormat('d MMMM, cccc, HH:mm');\nconst id = Math.random().toString(36).slice(2, 7).toUpperCase();\nreturn [{ json: {\n  ok: true, chatId: chatId, id: id,\n  date: d.date, time: d.time, procedure: d.procedure, name: d.name, phone: phone, note: d.note || '', master: master, duration: duration,\n  start: start.toISO(), end: end.toISO(),\n  summary: d.procedure + ' · ' + d.name,\n  description: 'Телефон: ' + phone + NL + 'Майстер: ' + master + NL + 'Тривалість: ' + duration + ' хв' + (d.note ? NL + 'Нотатка: ' + d.note : '') + NL + 'ID: ' + id + NL + 'Записано через бота',\n  confirmReply: 'Записала ✓ #' + id + NL + '<b>' + esc(d.procedure) + '</b>, ' + esc(d.name) + NL + esc(whenLabel) + '–' + end.toFormat('HH:mm') + NL + 'Телефон: ' + esc(phone) + (phone === '—' ? NL + '(номера немає, допиши в календарі)' : '')\n} }];"
+      },
+      "id": "3649c303-784a-4ab9-bb69-62eefc0b4eb1",
+      "name": "Перевірити дані",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        1344
+      ],
+      "notes": "Разбирает JSON от AI, проверяет дату, время, процедуру, имя и что время не в прошлом. Все процедуры по 3 часа (DUR), мастер по процедуре (MASTER). Даёт записи ID."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "41ea4f5a-f5ab-4365-9ee3-31f44c77675c",
+      "name": "Дані повні?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        1344
+      ],
+      "notes": "true: идём проверять слот. false: отвечаем, чего не хватает."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.start }}",
+        "timeMax": "={{ $json.end }}",
+        "options": {
+          "recurringEventHandling": "expand"
+        }
+      },
+      "id": "bdf3e3d5-d30b-4cf6-820e-82e3a832bbaa",
+      "name": "Події на цей час",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1696,
+        1248
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "События, пересекающиеся с ручной записью. Пустой ответ = свободно."
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $('Перевірити дані').first().json;\nconst NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst masterOf = function (e) { const line = String(e.description || '').split(NL).find(function (l) { return l.indexOf('Майстер:') === 0; }); return line ? line.slice(8).trim() : ''; };\nconst busy = $input.all().map(function (i) { return i.json; }).filter(function (e) { return e && e.id && e.status !== 'cancelled' && e.start && e.start.dateTime && String(e.description || '').indexOf('Записано через бота') !== -1 && masterOf(e) === b.master; });\nconst conflicts = busy.map(function (e) { return DateTime.fromISO(e.start.dateTime).setZone(TZ).toFormat('HH:mm') + '–' + DateTime.fromISO(e.end.dateTime).setZone(TZ).toFormat('HH:mm') + ' ' + esc(e.summary); });\nconst busyReply = 'У ' + esc(b.master) + ' цей час зайнятий:' + NL + conflicts.join(NL) + NL + NL + 'Обери інший час і напиши запис ще раз.';\nreturn [{ json: Object.assign({}, b, { free: busy.length === 0, busyReply: busyReply }) }];"
+      },
+      "id": "8866ff71-2761-4d36-91bf-2f19e6d1afde",
+      "name": "Перевірити слот",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1248
+      ],
+      "notes": "Занято, если в это время есть событие бота у того же мастера."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.free }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "bbad811d-100a-4805-8e85-3ed023fe03cb",
+      "name": "Слот вільний?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2144,
+        1248
+      ],
+      "notes": "true: создаём событие. false: отвечаем, что занято."
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}",
+          "summary": "={{ $json.summary }}"
+        }
+      },
+      "id": "2cc1c3f6-1b9e-4e8a-9ca6-c2a8b3325760",
+      "name": "Створити подію",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        1040
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "Событие для ручной записи, тот же формат описания, что и у заявок из формы."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.busyReply }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "699ea802-6669-4014-ae49-a5dc84a50e40",
+      "name": "Відповісти: зайнято",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2368,
+        1344
+      ],
+      "webhookId": "c55a72c5-238f-42ea-aed0-df9f4f245f6a",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Время пересекается с другой записью того же мастера."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.reply }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "9682ee04-81d4-4439-b935-a4c1ca9f1aec",
+      "name": "Відповісти: чого не вистачає",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        1440
+      ],
+      "webhookId": "84330a7d-674a-4661-88f0-a6dbb4405bac",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Каких данных нет или дата в прошлом. Текст из «Перевірити дані»."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "Привіт! Щоб записатися на манікюр, педикюр чи масаж у MaYa home studio, заповніть коротку форму:\nhttps://colossal-giraffe.pikapod.net/form/maya-zapys\n\nПісля цього майстер підтвердить запис тут, у боті.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "f2b04fa9-28b9-447a-ae23-5ec968df3746",
+      "name": "Підказка клієнтці",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        1184
+      ],
+      "webhookId": "3199c34a-7973-411a-881b-bd17ff10a02d",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Если клиентка пишет боту что-то своё, отправляем ссылку на форму."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.queryId }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2cf4f569-70c2-44c3-a4cf-a480d0c7fc39",
+      "name": "Це кнопка?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        1392
+      ],
+      "notes": "Если нажали кнопку, Telegram ждёт ответа на callback, иначе на кнопке крутятся часики."
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $json.queryId }}",
+        "additionalFields": {
+          "text": "Прийнято"
+        }
+      },
+      "id": "80efd0a6-7568-427f-a612-58798dba3d29",
+      "name": "Відповісти на кнопку",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        1392
+      ],
+      "webhookId": "78846501-f06d-4aab-841b-6d6eeb46e70d",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Убирает часики на кнопке. Ошибки игнорируются, на логику не влияет."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "schedule"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "sheet"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "cancel"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "notecal"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f692178d-ab30-47e2-8b9f-96edef53706c",
+      "name": "Що робимо?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1248,
+        320
+      ],
+      "notes": "schedule: ставим или двигаем событие. sheet: только строка в таблице. cancel: удаляем событие и правим строку. none: дальше ничего, сообщения уже ушли через «Розгорнути повідомлення»."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.start }}",
+        "timeMax": "={{ DateTime.fromISO($json.start).plus({ minutes: 240 }).toISO() }}",
+        "options": {
+          "recurringEventHandling": "expand"
+        }
+      },
+      "id": "155344ce-8f65-4216-87f3-e7b9d78b7c81",
+      "name": "Зайнятість майстра",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1472,
+        176
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "Берёт события календаря, которые пересекаются с новым временем (3 часа). Пустой ответ значит свободно, поэтому alwaysOutputData включён."
+    },
+    {
+      "parameters": {
+        "jsCode": "const b0 = $('Обробити дію').first().json;\nconst p = $('Розібрати апдейт').first().json;\nconst NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst PROCS = [\n  { re: /(манік|маник)[^]*педик|педик[^]*(манік|маник)|комплекс/, min: 180 },\n  { re: /нарощ|наращ/, min: 180 },\n  { re: /масаж|массаж|швз/, min: 90 },\n  { re: /педик|обробк/, min: 60 },\n  { re: /манік|маник/, min: 120 }\n];\nconst procText = String((b0.row && b0.row['Процедура']) || '').toLowerCase();\nconst pm = PROCS.find((x) => x.re.test(procText));\nlet DUR = pm ? pm.min : (b0.master === 'Марія' ? 90 : 120);\nconst dm = String(p.act === 'time' ? (p.text || '') : '').toLowerCase().match(/([0-9]+(?:[.,][0-9]+)?)\\s*(год|г|h|час)/);\nif (dm) { const h = Number(dm[1].replace(',', '.')); if (h > 0 && h <= 6) DUR = Math.round(h * 60); }\nconst st = DateTime.fromISO(b0.start).setZone(TZ);\nconst en = st.plus({ minutes: DUR });\nconst b = Object.assign({}, b0, {\n  end: en.toISO(),\n  whenLabel: st.setLocale('uk').toFormat('d MMMM, cccc, HH:mm') + '–' + en.toFormat('HH:mm'),\n  description: String(b0.description || '').replace(/Тривалість: [0-9]+ хв/, 'Тривалість: ' + DUR + ' хв'),\n  duration: DUR\n});\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst masterOf = function (e) { const line = String(e.description || '').split(NL).find(function (l) { return l.indexOf('Майстер:') === 0; }); return line ? line.slice(8).trim() : ''; };\nconst busy = $input.all().map(function (i) { return i.json; }).filter(function (e) {\n  if (!(e && e.id && e.status !== 'cancelled' && e.start && e.start.dateTime)) return false;\n  if (String(e.description || '').indexOf('Записано через бота') === -1 || masterOf(e) !== b.master || e.id === b.eventId) return false;\n  const es = DateTime.fromISO(e.start.dateTime), ee = DateTime.fromISO(e.end.dateTime);\n  return es < en && ee > st;\n});\nif (busy.length) {\n  const list = busy.map(function (e) { return DateTime.fromISO(e.start.dateTime).setZone(TZ).toFormat('dd.LL HH:mm') + '–' + DateTime.fromISO(e.end.dateTime).setZone(TZ).toFormat('HH:mm') + ' ' + esc(e.summary); }).join(NL);\n  return [{ json: { free: false, out: [{ chatId: b.adminChat, kind: 'force', id: b.id, url: 'https://t.me/', text: 'У ' + esc(b.master) + ' цей час зайнятий:' + NL + list + NL + NL + '#' + b.id + ' · ' + b.who + NL + 'Напиши новий час відповіддю на це повідомлення, наприклад: 25.10 14:00 або 25.10 14:00 3 год' }] } }];\n}\nreturn [{ json: Object.assign({}, b, { free: true }) }];"
+      },
+      "id": "f21c58e9-1c7a-4809-a242-7bd7f681d601",
+      "name": "Перевірити слот заявки",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        176
+      ],
+      "notes": "Считает занятым только события бота (в описании «Записано через бота») того же мастера. Своё же событие при переносе не считается. Если занято, просит у админа другое время."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.free }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b3a86d0a-1bc9-4c29-bdf6-4c6e403f0c05",
+      "name": "Вільно?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        176
+      ],
+      "notes": "true: ставим в календарь. false: сообщение «зайнято» уходит админу."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.eventId }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "94838585-5286-4efc-9656-d938613464ec",
+      "name": "Подія вже є?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2144,
+        96
+      ],
+      "notes": "Если у заявки уже есть Event ID, двигаем существующее событие (перенос), иначе создаём новое."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "eventId": "={{ $json.eventId }}",
+        "updateFields": {
+          "description": "={{ $json.description }}",
+          "end": "={{ $json.end }}",
+          "start": "={{ $json.start }}",
+          "summary": "={{ $json.summary }}"
+        }
+      },
+      "id": "f9fc0a43-6542-4949-b41f-0f032dce8f6c",
+      "name": "Перенести подію",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        0
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "Переносит существующее событие по Event ID на новое время."
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $('Перевірити слот заявки').first().json;\nconst ev = $input.first().json;\nconst NL = String.fromCharCode(10);\nconst row = Object.assign({}, b.row, { 'Дата': b.date, 'Час': b.time, 'Event ID': ev.id || b.eventId, 'Статус': b.newStatus, 'Тривалість хв': b.duration || 150 });\nconst moved = b.newStatus === 'Перенесено';\nconst out = [];\nconst adminText = (moved ? 'Перенесено ✓ #' : 'Записано ✓ #') + b.id + NL + b.who + NL + b.whenLabel + (b.clientChat ? '' : NL + '(клієнтка не підключила бота, напиши їй в особисті)');\nout.push({ chatId: String(b.adminChat), text: adminText, kind: 'plain', id: b.id, url: 'https://t.me/' });\nif (String(b.masterChat) !== String(b.adminChat)) out.push({ chatId: String(b.masterChat), text: adminText, kind: 'plain', id: b.id, url: 'https://t.me/' });\nif (b.clientChat) out.push({ chatId: String(b.clientChat), kind: 'client', id: b.id, url: 'https://t.me/', text: (moved ? 'Ваш запис перенесено ✓' : 'Ви записані ✓') + NL + b.who + NL + b.whenLabel + NL + NL + 'Якщо потрібно перенести чи скасувати, натисніть кнопку нижче.' });\nreturn [{ json: { row: row, out: out } }];"
+      },
+      "id": "cc2b50da-20e6-4d04-b5bc-2f3cdae0eff9",
+      "name": "Після календаря",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        96
+      ],
+      "notes": "Берёт Event ID из календаря, обновляет строку (дата, время, статус) и готовит сообщения: мастеру, админу, который нажал, и клиентке с кнопками «Перенести/Скасувати». Данные из «Перевірити слот заявки» (cross-node ссылка, при переименовании поправить)."
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "description": "={{ $json.description }}",
+          "summary": "={{ $json.summary }}"
+        }
+      },
+      "id": "397256af-93a7-46da-9168-5d37fe0e5cb5",
+      "name": "Створити подію заявки",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        192
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "Создаёт событие в общем календаре. В описании мастер, телефон, ID и метка «Записано через бота», по ним работают /today и проверка слотов."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc",
+          "cachedResultName": "MaYa studio · Записи"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Дата",
+              "id": "Дата",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Час",
+              "id": "Час",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Процедура",
+              "id": "Процедура",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Майстер",
+              "id": "Майстер",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Імʼя",
+              "id": "Імʼя",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Телефон",
+              "id": "Телефон",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Тривалість хв",
+              "id": "Тривалість хв",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нотатка",
+              "id": "Нотатка",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Записано",
+              "id": "Записано",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Event ID",
+              "id": "Event ID",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ID",
+              "id": "ID",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Статус",
+              "id": "Статус",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Telegram",
+              "id": "Telegram",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Chat ID клієнтки",
+              "id": "Chat ID клієнтки",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Джерело",
+              "id": "Джерело",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нагадування за день",
+              "id": "Нагадування за день",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нагадування за годину",
+              "id": "Нагадування за годину",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нотатка майстра",
+              "id": "Нотатка майстра",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "Chat ID клієнтки": "={{ $json.row['Chat ID клієнтки'] }}",
+            "Event ID": "={{ $json.row['Event ID'] }}",
+            "ID": "={{ $json.row['ID'] }}",
+            "Telegram": "={{ $json.row['Telegram'] }}",
+            "Імʼя": "={{ $json.row['Імʼя'] }}",
+            "Дата": "={{ $json.row['Дата'] }}",
+            "Джерело": "={{ $json.row['Джерело'] }}",
+            "Записано": "={{ $json.row['Записано'] }}",
+            "Майстер": "={{ $json.row['Майстер'] }}",
+            "Нагадування за годину": "={{ $json.row['Нагадування за годину'] || '' }}",
+            "Нагадування за день": "={{ $json.row['Нагадування за день'] || '' }}",
+            "Нотатка": "={{ $json.row['Нотатка'] }}",
+            "Нотатка майстра": "={{ $json.row['Нотатка майстра'] || '' }}",
+            "Процедура": "={{ $json.row['Процедура'] }}",
+            "Статус": "={{ $json.row['Статус'] }}",
+            "Телефон": "={{ $json.row['Телефон'] }}",
+            "Тривалість хв": "={{ $json.row['Тривалість хв'] }}",
+            "Час": "={{ $json.row['Час'] }}"
+          }
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "36d92405-c8f2-4955-8d21-352267beb073",
+      "name": "Оновити рядок",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2816,
+        704
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Обновляет строку заявки по колонке ID: статус, дата, время, Event ID, chat id клиентки. Все входы дают поле row с полной строкой."
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com",
+          "cachedResultName": "mariiarimmal@gmail.com"
+        },
+        "eventId": "={{ $json.eventId }}",
+        "options": {}
+      },
+      "id": "72c42297-615b-4cf4-8451-6690d09214ab",
+      "name": "Видалити подію",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        624
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Удаляет событие при отмене или отклонении уже подтверждённой записи. Ошибка (событие уже удалено руками) не останавливает обновление таблицы."
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { row: $('Обробити дію').first().json.row } }];"
+      },
+      "id": "97a99e14-6952-4218-80ba-dc5190c70ccd",
+      "name": "Рядок після видалення",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        624
+      ],
+      "notes": "Calendar delete возвращает только success, поэтому строку для таблицы берём обратно из «Обробити дію»."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Перевірити слот').item.json.chatId }}",
+        "text": "={{ $('Перевірити слот').item.json.confirmReply }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "5affefac-6b97-47f3-aff0-1d4a90779da8",
+      "name": "Підтвердити запис",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2592,
+        944
+      ],
+      "webhookId": "eec80872-18c1-4810-acd1-ed8742be915c",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Подтверждение ручной записи. Данные из «Перевірити слот» (cross-node ссылка)."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc",
+          "cachedResultName": "MaYa studio · Записи"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата": "={{ $('Перевірити слот').item.json.date }}",
+            "Час": "={{ $('Перевірити слот').item.json.time }}",
+            "Процедура": "={{ $('Перевірити слот').item.json.procedure }}",
+            "Майстер": "={{ $('Перевірити слот').item.json.master }}",
+            "Імʼя": "={{ $('Перевірити слот').item.json.name }}",
+            "Телефон": "={{ $('Перевірити слот').item.json.phone }}",
+            "Тривалість хв": "={{ $('Перевірити слот').item.json.duration }}",
+            "Нотатка": "={{ $('Перевірити слот').item.json.note }}",
+            "Записано": "={{ $now.setZone(\"Europe/Kiev\").toFormat(\"dd.LL.yyyy HH:mm\") }}",
+            "Event ID": "={{ $json.id }}",
+            "ID": "={{ $('Перевірити слот').item.json.id }}",
+            "Статус": "Підтверджено",
+            "Telegram": "",
+            "Chat ID клієнтки": "",
+            "Джерело": "Вручну"
+          },
+          "schema": [
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Час",
+              "displayName": "Час",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Процедура",
+              "displayName": "Процедура",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Майстер",
+              "displayName": "Майстер",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Імʼя",
+              "displayName": "Імʼя",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Телефон",
+              "displayName": "Телефон",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Тривалість хв",
+              "displayName": "Тривалість хв",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Нотатка",
+              "displayName": "Нотатка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Записано",
+              "displayName": "Записано",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Event ID",
+              "displayName": "Event ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telegram",
+              "displayName": "Telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat ID клієнтки",
+              "displayName": "Chat ID клієнтки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Джерело",
+              "displayName": "Джерело",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "matchingColumns": []
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "c813cbe8-f415-4973-bd1c-464bb6c00240",
+      "name": "Додати в таблицю",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2592,
+        1136
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Ручная запись строкой в таблицу, сразу со статусом «Підтверджено» и источником «Вручну»."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 21
+            }
+          ]
+        }
+      },
+      "id": "53af163d-03b2-4094-bfee-a3999b4af943",
+      "name": "Щовечора о 21:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        1584
+      ],
+      "notes": "Каждый вечер в 21:00 по Киеву шлёт расписание на завтра Марии. Часовой пояс в настройках воркфлоу."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "c94b6af7-7838-46c7-81bc-1de5343c2b07",
+      "name": "Кожні 15 хв",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        2400
+      ],
+      "notes": "Раз в 15 минут запускает проверку напоминаний. Чаще не нужно: окно часового напоминания 60 минут, суточного 60 минут, флаги в таблице не дают отправить дважды."
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "options": {}
+      },
+      "id": "cc428d0f-e0b7-488a-9b1a-d5cfdcec1f96",
+      "name": "Записи для нагадувань",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        2400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Читает всю таблицу записей. Одна операция чтения на запуск, квоту Google Sheets не трогает."
+    },
+    {
+      "parameters": {
+        "jsCode": "const NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst now = DateTime.now().setZone(TZ);\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst ADM = ['1410749653', '5983686765'];\nconst MARK = { 'Марія': '🟣', 'Ярослава': '🟢' };\nconst COLS = ['Дата','Час','Процедура','Майстер','Імʼя','Телефон','Тривалість хв','Нотатка','Записано','Event ID','ID','Статус','Telegram','Chat ID клієнтки','Джерело','Нагадування за день','Нагадування за годину','Нотатка майстра','Нагадування адмінам'];\nconst normDate = function (v) {\n  if (typeof v === 'number') return DateTime.fromObject({ year: 1899, month: 12, day: 30 }).plus({ days: Math.floor(v) }).toISODate();\n  const s = String(v).trim();\n  const m = s.match(/^([0-9]{1,2})[.]([0-9]{1,2})[.]([0-9]{4})$/);\n  return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : s;\n};\nconst normTime = function (v) {\n  if (typeof v === 'number') { const t = Math.round(v * 1440); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); }\n  const m = String(v).match(/([0-9]{1,2})[:.]([0-9]{2})/);\n  return m ? m[1].padStart(2, '0') + ':' + m[2] : String(v).trim();\n};\nconst notesOf = function (v) { return String(v || '').split('|').map(function (x) { return x.trim().replace(/^[0-9]{1,2}[.][0-9]{1,2}: */, '').trim(); }).filter(Boolean); };\nconst res = [];\n$input.all().forEach(function (i) {\n  const r = i.json;\n  if (!r || !r['ID']) return;\n  const st = String(r['Статус'] || '');\n  if (st !== 'Підтверджено' && st !== 'Перенесено') return;\n  const row = {};\n  COLS.forEach(function (c) { row[c] = r[c] == null ? '' : r[c]; });\n  row['Дата'] = normDate(row['Дата']);\n  row['Час'] = normTime(row['Час']);\n  const s = DateTime.fromISO(row['Дата'] + 'T' + row['Час'], { zone: TZ });\n  if (!s.isValid) return;\n  const mins = s.diff(now, 'minutes').minutes;\n  const who = esc(row['Процедура']);\n  const name = esc(row['Імʼя']);\n  const id = String(row['ID']);\n  const out = [];\n  const key = s.toFormat('yyyy-LL-dd HH:mm');\n  if (mins > 0 && mins <= 60 && String(row['Нагадування адмінам']).indexOf(key) !== 0) {\n    row['Нагадування адмінам'] = key + ' · надіслано ' + now.toFormat('dd.LL HH:mm');\n    const master = String(row['Майстер'] || '');\n    const phone = String(row['Телефон'] || '').trim();\n    let t = '⏰ <b>Через годину клієнтка</b>' + NL + (MARK[master] || '⚪️') + ' <b>' + s.toFormat('HH:mm') + '</b> · ' + esc(master || 'майстер?') + NL + who + ', ' + name;\n    if (phone && phone !== '—') t += NL + '📞 ' + esc(phone);\n    notesOf(row['Нотатка майстра']).forEach(function (n) { t += NL + '📝 ' + esc(n); });\n    t += NL + '✏️ /n_' + esc(id);\n    ADM.forEach(function (c) { out.push({ chatId: c, kind: 'plain', id: id, url: 'https://t.me/', text: t }); });\n  }\n  const chat = String(row['Chat ID клієнтки'] || '').trim();\n  if (chat) {\n    if (mins > 0 && mins <= 60 && !String(row['Нагадування за годину']).trim()) {\n      row['Нагадування за годину'] = now.toFormat('dd.LL HH:mm');\n      out.push({ chatId: chat, kind: 'plain', id: id, url: 'https://t.me/', text: name + ', чекаємо на вас сьогодні о ' + s.toFormat('HH:mm') + ' ✨' + NL + who });\n    } else if (mins > 23 * 60 && mins <= 24 * 60 && !String(row['Нагадування за день']).trim()) {\n      row['Нагадування за день'] = now.toFormat('dd.LL HH:mm');\n      out.push({ chatId: chat, kind: 'client', id: id, url: 'https://t.me/', text: 'Нагадуємо: завтра у вас ' + who + NL + s.setLocale('uk').toFormat('d MMMM, cccc, HH:mm') + NL + NL + 'Якщо плани змінились, натисніть кнопку нижче, і майстер з вами звʼяжеться.' });\n    }\n  }\n  if (out.length) res.push({ json: { row: row, out: out } });\n});\nreturn res;"
+      },
+      "id": "9e89c5ff-6a2a-47b4-86b9-0c399ef0d496",
+      "name": "Кому нагадати",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        2400
+      ],
+      "notes": "Берёт записи со статусом Підтверджено или Перенесено, у которых есть Chat ID клиентки. До визита от 23 до 24 часов и флаг «Нагадування за день» пуст: напоминание с кнопками перенос/отмена. До визита 0-60 минут и флаг «Нагадування за годину» пуст: короткое напоминание. Ставит время отправки во флаг. При подтверждении или переносе флаги обнуляются сами, потому что та ветка эти колонки не передаёт. Если записали меньше чем за 23 часа, суточное напоминание пропускается."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "cachedResultName": "mariiarimmal@gmail.com",
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com"
+        },
+        "eventId": "={{ $json.eventId }}",
+        "updateFields": {
+          "description": "={{ $json.description }}"
+        }
+      },
+      "id": "3edcef7f-7907-48a8-b0ff-00031f045188",
+      "name": "Нотатка в подію",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2608,
+        1312
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Дописывает заметку мастера в описание события календаря (полный текст описания собран в «Обробити дію»). Ошибка не мешает сохранить заметку в таблицу."
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Дописати",
+                    "additionalFields": {
+                      "callback_data": "=nt:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Замінити",
+                    "additionalFields": {
+                      "callback_data": "=nr:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Очистити",
+                    "additionalFields": {
+                      "callback_data": "=nc:{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Телефон",
+                    "additionalFields": {
+                      "callback_data": "=np:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Інший час",
+                    "additionalFields": {
+                      "callback_data": "=rt:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "Написати",
+                    "additionalFields": {
+                      "url": "={{ $json.url }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "8b8fb835-3ec5-4df1-a16f-3f7058e6231a",
+      "name": "Картка запису",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3264,
+        1200
+      ],
+      "webhookId": "47159116-9a74-45ad-9c4d-6f538512e59e",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Картка одного запису для адмінів (команда /n_ID з розкладу або після зміни нотатки). Кнопки: nt дописати, nr замінити, nc очистити нотатку, np змінити телефон, rt інший час. Обробляє «Обробити дію»."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ID",
+              "id": "ID",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нагадування адмінам",
+              "id": "Нагадування адмінам",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "ID": "={{ $json.row['ID'] }}",
+            "Нагадування адмінам": "={{ $json.row['Нагадування адмінам'] || '' }}"
+          }
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "d716f4a0-fc5c-4db9-8697-6ebd8ff1b4a9",
+      "name": "Позначити нагадування адмінам",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        720,
+        2560
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Пишет в колонку «Нагадування адмінам» время визита, про который уже напомнили админам. Отдельная нода, потому что «Оновити рядок» эту колонку не трогает и не сотрёт её при правке нотатки. При переносе визита время другое, и напоминание придёт заново."
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Нотатки",
+          "mode": "id",
+          "value": "2026102301"
+        },
+        "options": {}
+      },
+      "id": "b87d4d39-2719-42e9-9783-2275cc566b99",
+      "name": "Нотатки: таблиця",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        1840
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Читает лист «Нотатки» (личные заметки Марии) целиком. alwaysOutputData включён, чтобы при пустом листе всё равно добавить первую заметку."
+    },
+    {
+      "parameters": {
+        "jsCode": "const p = $('Розібрати апдейт').first().json;\nconst NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst now = DateTime.now().setZone(TZ);\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst fmt = function (s) { const d = DateTime.fromFormat(String(s || '').trim(), 'yyyy-LL-dd HH:mm', { zone: TZ }); return d.isValid ? d.setLocale('uk').toFormat('d MMMM, cccc, HH:mm') : ''; };\n\nfunction parseNote(txt, now, TZ, DateTime) {\n  let t = ' ' + String(txt || '') + ' ';\n  const low = () => t.toLowerCase();\n  let date = null, h = null, mi = 0, rel = null;\n  const cut = (m) => { t = t.slice(0, m.index) + ' ' + t.slice(m.index + m[0].length); };\n  let m = low().match(/ через +([0-9]+) *(хв|хвилин[уи]?|мин|минут[уы]?|год|годин[уи]?|час[аов]*)(?=[^a-zа-яіїєґ]|$)/i);\n  if (m) {\n    const n = Number(m[1]);\n    rel = /^(хв|мин)/.test(m[2]) ? now.plus({ minutes: n }) : now.plus({ hours: n });\n    cut(m);\n  } else {\n    m = low().match(/ через +(годину|час)(?=[^a-zа-яіїєґ]|$)/i);\n    if (m) { rel = now.plus({ hours: 1 }); cut(m); }\n  }\n  if (rel) return { when: rel.set({ second: 0, millisecond: 0 }), text: t.replace(/ +/g, ' ').trim() };\n  const today = now.startOf('day');\n  m = low().match(/ ([0-9]{1,2})[.]([0-9]{1,2})(?:[.]([0-9]{2,4}))?(?=[^0-9]|$)/);\n  if (m) {\n    let y = m[3] ? Number(m[3]) : now.year; if (y < 100) y += 2000;\n    let d = DateTime.fromObject({ year: y, month: Number(m[2]), day: Number(m[1]) }, { zone: TZ });\n    if (d.isValid) { if (!m[3] && d < today) d = d.plus({ years: 1 }); date = d; cut(m); }\n  }\n  if (!date) {\n    const W = [[['післязавтра', 'послезавтра'], 2], [['завтра'], 1], [['сьогодні', 'сегодня'], 0]];\n    for (const [ws, add] of W) {\n      const re = new RegExp(' (' + ws.join('|') + ')(?=[^a-zа-яіїєґ]|$)', 'i');\n      const mm = low().match(re);\n      if (mm) { date = today.plus({ days: add }); cut(mm); break; }\n    }\n  }\n  if (!date) {\n    const WD = [['понеділок', 'понедельник', 'пн'], ['вівторок', 'вторник', 'вт'], ['середу', 'середа', 'среду', 'среда', 'ср'], ['четвер', 'четверг', 'чт'], ['пʼятницю', \"п'ятницю\", 'пятницю', 'пятница', 'пятницу', 'пʼятниця', \"п'ятниця\", 'пт'], ['суботу', 'субота', 'субботу', 'суббота', 'сб'], ['неділю', 'неділя', 'воскресенье', 'нд']];\n    for (let i = 0; i < 7; i++) {\n      const re = new RegExp(' (?:в |у |во )?(' + WD[i].join('|') + ')(?=[^a-zа-яіїєґʼ\\']|$)', 'i');\n      const mm = low().match(re);\n      if (mm) { let diff = (i + 1 - now.weekday + 7) % 7; if (diff === 0) diff = 7; date = today.plus({ days: diff }); cut(mm); break; }\n    }\n  }\n  m = low().match(/ (?:о |в |об |на )?([0-9]{1,2})[:]([0-9]{2})(?=[^0-9]|$)/);\n  if (m) { h = Number(m[1]); mi = Number(m[2]); cut(m); }\n  else {\n    m = low().match(/ (?:о|в|об|на) ([0-9]{1,2})(?: *(?:год|час))?(?=[^0-9:.]|$)/);\n    if (m) { h = Number(m[1]); if (h >= 1 && h <= 7) h += 12; cut(m); }\n  }\n  if (h !== null && (h > 23 || mi > 59)) h = null;\n  let when = null;\n  if (date && h === null) when = date.set({ hour: 10, minute: 0 });\n  else if (h !== null) {\n    when = (date || today).set({ hour: h, minute: mi, second: 0, millisecond: 0 });\n    if (!date && when <= now) when = when.plus({ days: 1 });\n  }\n  return { when, text: t.replace(/ +/g, ' ').replace(/^[ ,.:–-]+/, '').trim() };\n}\n\nconst rows = $input.all().map(function (i) { return i.json; }).filter(function (r) { return r && r['ID']; });\nconst out = [];\nconst send = function (text) { out.push({ chatId: String(p.chatId), text: text, kind: 'plain', id: '', url: 'https://t.me/' }); };\nconst finish = function (extra) { return [{ json: Object.assign({ op: 'none', out: out }, extra || {}) }]; };\nconst clean = function (s) { return String(s || '').replace(/^(нагадай|нагадати|напомни|напомнить)( мені| мне)?[ ,:]*/i, '').trim(); };\nconst pick = function (id) { const f = rows.find(function (r) { return String(r['ID']).trim().toUpperCase() === String(id).toUpperCase(); }); if (!f) return null; return { 'ID': String(f['ID']), 'Створено': String(f['Створено'] || ''), 'Текст': String(f['Текст'] || ''), 'Нагадати': String(f['Нагадати'] || ''), 'Статус': String(f['Статус'] || ''), 'Надіслано': String(f['Надіслано'] || '') }; };\nconst HELP = '📌 <b>Мої нотатки</b>' + NL + 'Пиши повідомлення, що починається з «!», наприклад:' + NL + '<i>! завтра 10:00 купити гель</i>' + NL + '<i>! через 30 хв подзвонити Насті</i>' + NL + '<i>! в пʼятницю оплатити оренду</i>' + NL + '<i>! ідея для посту про масаж</i> (без часу, просто нотатка)' + NL + NL + 'Список: /notes';\nif (p.act === 'nadd') {\n  const raw = String(p.text || '').replace(/^!+/, '').trim();\n  if (!raw) { send(HELP); return finish(); }\n  const r = parseNote(raw, now, TZ, DateTime);\n  const text = clean(r.text) || raw;\n  const id = 'NT' + Math.random().toString(36).slice(2, 6).toUpperCase().padEnd(4, '0');\n  const row = { 'ID': id, 'Створено': now.toFormat('dd.LL.yyyy HH:mm'), 'Текст': text, 'Нагадати': r.when ? r.when.toFormat('yyyy-LL-dd HH:mm') : '', 'Статус': 'Активна', 'Надіслано': '' };\n  send('📌 Збережено #' + id + NL + esc(text) + NL + (r.when ? '⏰ Нагадаю ' + esc(fmt(row['Нагадати'])) : 'Без нагадування') + NL + NL + 'Усі нотатки: /notes');\n  return finish({ op: 'add', row: row });\n}\nif (p.act === 'nlist') {\n  const act = rows.filter(function (r) { return String(r['Статус'] || '') !== 'Виконано'; });\n  if (!act.length) { send('Активних нотаток немає ✨' + NL + NL + HELP); return finish(); }\n  act.sort(function (a, b) { const x = String(a['Нагадати'] || 'z'), y = String(b['Нагадати'] || 'z'); return x.localeCompare(y); });\n  const blocks = act.map(function (r) { const w = fmt(r['Нагадати']); return '📌 ' + esc(r['Текст']) + NL + (w ? '⏰ ' + esc(w) + (String(r['Надіслано'] || '').trim() ? ' (уже нагадала)' : '') : 'без нагадування') + NL + '✅ /done_' + esc(r['ID']); });\n  let text = '<b>Мої нотатки</b> · ' + act.length + NL + NL + blocks.join(NL + NL);\n  if (text.length > 3900) text = text.slice(0, 3800) + NL + '…';\n  send(text);\n  return finish();\n}\nif (p.act === 'ndone' || p.act === 'nsnooze') {\n  const row = pick(p.id);\n  if (!row) { send('Нотатку #' + esc(p.id) + ' не знайшла.'); return finish(); }\n  if (p.act === 'ndone') { row['Статус'] = 'Виконано'; send('✅ Виконано: ' + esc(row['Текст'])); return finish({ op: 'update', row: row }); }\n  const r = parseNote(p.text, now, TZ, DateTime);\n  if (!r.when) { send('Не зрозуміла час. Відповідай на нагадування так: <i>завтра 12:00</i>, <i>через 2 години</i>, <i>25.10 о 15</i>'); return finish(); }\n  row['Нагадати'] = r.when.toFormat('yyyy-LL-dd HH:mm'); row['Надіслано'] = ''; row['Статус'] = 'Активна';\n  send('⏰ Перенесла #' + row['ID'] + ' на ' + esc(fmt(row['Нагадати'])) + NL + esc(row['Текст']));\n  return finish({ op: 'update', row: row });\n}\nreturn finish();"
+      },
+      "id": "109f7cb8-2401-47c2-a684-e05fba10cbba",
+      "name": "Обробити нотатку",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        1840
+      ],
+      "notes": "Личные заметки Марии. nadd: сообщение с «!», из текста вытаскивается время (завтра, дд.мм, день недели, чч:мм, «о 15», «через N хв/год»), дата без времени = 10:00. nlist: /notes. ndone: /done_ID. nsnooze: ответ на напоминание с #NTxxxx новым временем. op add/update уходит в таблицу, сообщения в out. ID заметок начинаются с NT и длиной 6, чтобы не путаться с ID записей (5 символов)."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "add"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.op }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "update"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                }
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8bbaa3f6-d6db-4223-a5f0-b40989a10fba",
+      "name": "Нотатка: що робимо?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        1840
+      ],
+      "notes": "add: новая заметка строкой в лист «Нотатки». update: поменять статус или время по ID. none (список, ошибки) дальше не идёт."
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Нотатки",
+          "mode": "id",
+          "value": "2026102301"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ID",
+              "id": "ID",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Створено",
+              "id": "Створено",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Текст",
+              "id": "Текст",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нагадати",
+              "id": "Нагадати",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Статус",
+              "id": "Статус",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Надіслано",
+              "id": "Надіслано",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "ID": "={{ $json.row['ID'] }}",
+            "Нагадати": "={{ $json.row['Нагадати'] }}",
+            "Надіслано": "={{ $json.row['Надіслано'] }}",
+            "Статус": "={{ $json.row['Статус'] }}",
+            "Створено": "={{ $json.row['Створено'] }}",
+            "Текст": "={{ $json.row['Текст'] }}"
+          }
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "0f01199b-7ce2-436d-9d02-6ca5449e650b",
+      "name": "Нотатка: додати",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        1760
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Добавляет заметку строкой в лист «Нотатки». Заголовки листа должны совпадать с именами тут. RAW, чтобы «Нагадати» осталось текстом yyyy-MM-dd HH:mm."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Нотатки",
+          "mode": "id",
+          "value": "2026102301"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ID",
+              "id": "ID",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Створено",
+              "id": "Створено",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Текст",
+              "id": "Текст",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Нагадати",
+              "id": "Нагадати",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Статус",
+              "id": "Статус",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Надіслано",
+              "id": "Надіслано",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "ID": "={{ $json.row['ID'] }}",
+            "Нагадати": "={{ $json.row['Нагадати'] }}",
+            "Надіслано": "={{ $json.row['Надіслано'] || '' }}",
+            "Статус": "={{ $json.row['Статус'] }}",
+            "Створено": "={{ $json.row['Створено'] }}",
+            "Текст": "={{ $json.row['Текст'] }}"
+          }
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "id": "ff085e1a-c933-4349-be28-1d43904c30ca",
+      "name": "Нотатка: оновити",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        1936
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "Обновляет заметку по ID: статус Виконано, новое время при переносе, отметка «Надіслано» после напоминания. Сюда приходят и команды из чата, и таймер напоминаний."
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Нотатки",
+          "mode": "id",
+          "value": "2026102301"
+        },
+        "options": {}
+      },
+      "id": "48d1dcc8-8ebd-4530-8b3f-f457f6cd76f9",
+      "name": "Нотатки для нагадувань",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        2720
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Раз в 15 минут читает лист «Нотатки», чтобы найти заметки, о которых пора напомнить."
+    },
+    {
+      "parameters": {
+        "jsCode": "const NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst now = DateTime.now().setZone(TZ);\nconst esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };\nconst MARIA = '1410749653';\nconst res = [];\n$input.all().forEach(function (i) {\n  const r = i.json;\n  if (!r || !r['ID']) return;\n  if (String(r['Статус'] || '') !== 'Активна') return;\n  if (String(r['Надіслано'] || '').trim()) return;\n  const d = DateTime.fromFormat(String(r['Нагадати'] || '').trim(), 'yyyy-LL-dd HH:mm', { zone: TZ });\n  if (!d.isValid || d > now) return;\n  const row = { 'ID': String(r['ID']), 'Створено': String(r['Створено'] || ''), 'Текст': String(r['Текст'] || ''), 'Нагадати': String(r['Нагадати'] || ''), 'Статус': 'Активна', 'Надіслано': now.toFormat('dd.LL HH:mm') };\n  const text = '🔔 <b>Нагадування</b> #' + row['ID'] + NL + esc(row['Текст']) + NL + NL + '✅ /done_' + row['ID'] + NL + 'Перенести: відповідай на це повідомлення новим часом, наприклад <i>завтра 12:00</i> або <i>через 2 години</i>';\n  res.push({ json: { op: 'update', row: row, out: [{ chatId: MARIA, kind: 'plain', id: row['ID'], url: 'https://t.me/', text: text }] } });\n});\nreturn res;"
+      },
+      "id": "1d204a93-8180-4a68-8f78-030f70cddebd",
+      "name": "Які нотатки нагадати",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        2720
+      ],
+      "notes": "Берёт заметки со статусом Активна, у которых время уже наступило и «Надіслано» пусто. Шлёт Марии напоминание с #ID (по нему работает перенос ответом) и ставит флаг, чтобы не слать повторно. Точность до 15 минут из-за шага таймера."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $('Нове повідомлення').first().json.message;\nconst now = DateTime.now().setZone('Europe/Kiev');\nreturn [{ json: { chatId: msg.chat.id, timeMin: now.startOf('day').toISO(), timeMax: now.startOf('day').plus({ days: 7 }).toISO() } }];"
+      },
+      "id": "b02c5212-9fc5-4f51-9ce9-c17053585140",
+      "name": "Діапазон вільних",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        2912
+      ],
+      "notes": "Период для свободных окон: сейчас + 7 дней. chatId того, кто нажал кнопку."
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "cachedResultName": "mariiarimmal@gmail.com",
+          "mode": "id",
+          "value": "mariiarimmal@gmail.com"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $json.timeMin }}",
+        "timeMax": "={{ $json.timeMax }}",
+        "options": {
+          "recurringEventHandling": "expand"
+        }
+      },
+      "id": "63fda169-0d9c-46b7-9911-f662950d2e14",
+      "name": "Календар на тиждень",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        2912
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "ucZgP4gkuRKRBOUP",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "События общего календаря на 7 дней. Пустой ответ тоже ок: значит всё свободно."
+    },
+    {
+      "parameters": {
+        "jsCode": "const r = $('Діапазон вільних').first().json;\nconst low = String((($('Нове повідомлення').first().json.message) || {}).text || '').toLowerCase().replace(/^[/]free/, '');\nconst NL = String.fromCharCode(10);\nconst TZ = 'Europe/Kiev';\nconst DAYS = 7, OPEN = 13;\nconst PROCS = [\n  { re: /(манік|маник)[^]*педик|педик[^]*(манік|маник)|комплекс/, name: 'Манікюр + педикюр', master: 'Ярослава', min: 180 },\n  { re: /нарощ|наращ/, name: 'Нарощування', master: 'Ярослава', min: 180 },\n  { re: /масаж|массаж|швз|спин|шия|шея/, name: 'Масаж', master: 'Марія', min: 90 },\n  { re: /педик|обробк/, name: 'Педикюр', master: 'Ярослава', min: 60 },\n  { re: /манік|маник|покритт|гель|нігт|ногт/, name: 'Манікюр', master: 'Ярослава', min: 120 }\n];\nconst now = DateTime.now().setZone(TZ);\nconst masterOf = (e) => { const line = String(e.description || '').split(NL).find((l) => l.indexOf('Майстер:') === 0); return line ? line.slice(8).trim() : ''; };\nconst ev = $input.all().map((i) => i.json).filter((e) => e && e.id && e.status !== 'cancelled' && e.start && e.start.dateTime && String(e.description || '').indexOf('Записано через бота') !== -1)\n  .map((e) => ({ m: masterOf(e), s: DateTime.fromISO(e.start.dateTime).setZone(TZ), e: DateTime.fromISO(e.end.dateTime).setZone(TZ) }));\nconst roundUp = (d) => { const m = d.minute; if (m === 0 || m === 30) return d.set({ second: 0, millisecond: 0 }); return m < 30 ? d.set({ minute: 30, second: 0, millisecond: 0 }) : d.plus({ hours: 1 }).set({ minute: 0, second: 0, millisecond: 0 }); };\nconst fmtDur = (m) => (m % 60 ? String(m / 60).replace('.', ',') : String(m / 60)) + ' год';\nconst freeTimes = (master, slot, day, grid) => {\n  const iso = day.toISODate();\n  const open = day.set({ hour: OPEN, minute: 0 });\n  const close = day.set({ hour: 20, minute: 30 });\n  const dayBusy = ev.filter((x) => x.m === master && x.s.toISODate() === iso);\n  const cands = grid.map((t) => DateTime.fromISO(iso + 'T' + t, { zone: TZ }));\n  dayBusy.forEach((x) => cands.push(roundUp(x.e)));\n  const ok = cands\n    .filter((s) => s >= open && s >= now.plus({ hours: 1 }) && s.plus({ minutes: slot }) <= close)\n    .filter((s) => { const e = s.plus({ minutes: slot }); return !dayBusy.some((x) => x.s < e && x.e > s); })\n    .sort((a, b) => a.toMillis() - b.toMillis());\n  const free = [];\n  let last = null;\n  ok.forEach((s) => { if (!last || s >= last.plus({ minutes: slot })) { free.push(s.toFormat('HH:mm')); last = s; } });\n  return { free, busyCount: dayBusy.length, open };\n};\nconst everyHalf = [];\nfor (let h = 13; h <= 20; h++) { everyHalf.push(String(h) + ':00'); everyHalf.push(String(h) + ':30'); }\nconst proc = PROCS.find((p) => p.re.test(low));\nconst dm = low.match(/([0-9]+(?:[.,][0-9]+)?)\\s*(год|г|h|час)/);\nconst custom = dm ? Math.round(Number(dm[1].replace(',', '.')) * 60) : 0;\nlet text;\nif (proc) {\n  const slot = custom > 0 && custom <= 360 ? custom : proc.min;\n  const lines = [];\n  for (let d = 0; d < DAYS; d++) {\n    const day = now.startOf('day').plus({ days: d });\n    const res = freeTimes(proc.master, slot, day, everyHalf);\n    if (d === 0 && !res.free.length) continue;\n    lines.push('<b>' + day.setLocale('uk').toFormat('ccc, d MMMM') + '</b>: ' + (res.free.length ? res.free.join(', ') : 'зайнято'));\n  }\n  text = '<b>Вільний час: ' + proc.name + ', ' + fmtDur(slot) + '</b>' + NL + (proc.master === 'Марія' ? '🟣 Марія' : '🟢 Ярослава') + NL + NL + (lines.length ? lines.join(NL) : 'Вільного часу немає');\n} else {\n  const MASTERS = [\n    { name: 'Марія', label: '🟣 Масаж', slot: 90, starts: ['13:00', '14:30', '16:00', '17:30'] },\n    { name: 'Ярослава', label: '🟢 Манікюр/педикюр', slot: 120, starts: ['13:00', '15:00', '17:00'] }\n  ];\n  const blocks = [];\n  for (let d = 0; d < DAYS; d++) {\n    const day = now.startOf('day').plus({ days: d });\n    const lines = MASTERS.map((M) => {\n      const res = freeTimes(M.name, M.slot, day, M.starts);\n      if (!res.busyCount && now.plus({ hours: 1 }) <= res.open) return M.label + ': 13:00–20:00';\n      return M.label + ': ' + (res.free.length ? res.free.join(', ') : 'зайнято');\n    });\n    if (d === 0 && lines.every((l) => l.indexOf('зайнято') !== -1)) continue;\n    blocks.push('<b>' + day.setLocale('uk').toFormat('ccc, d MMMM') + '</b>' + NL + lines.join(NL));\n  }\n  text = '<b>Вільний час на 7 днів</b>' + NL + NL + (blocks.length ? blocks.join(NL + NL) : 'Вільного часу немає') + NL + NL + '<i>Під процедуру: «вільні педикюр», «вільні нарощування», «вільні манікюр 3 год»</i>';\n}\nreturn [{ json: { chatId: r.chatId, text } }];"
+      },
+      "id": "e5c411ac-2e2b-4731-90fe-dfa1cf67cab5",
+      "name": "Порахувати вільні",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        2912
+      ],
+      "notes": "Для каждого дня и мастера ищет промежутки без записей бота в рабочие часы OPEN-CLOSE, длиной от MIN минут. Сегодня считает от ближайшего получаса. Личные события календаря не учитываются. Часы и длина правятся в константах."
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "cachedResultName": "MaYa studio · Записи",
+          "mode": "id",
+          "value": "1lxwr1_9W3UE1TeSastU77koF-xj3DeXUJ9nFppafEfc"
+        },
+        "sheetName": {
+          "__rl": true,
+          "cachedResultName": "Untitled",
+          "mode": "id",
+          "value": "1080460121"
+        },
+        "options": {}
+      },
+      "id": "9f0143f5-9804-408a-a991-308ee047a627",
+      "name": "Таблиця для нових",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        3152
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "XiSHh7BsqyPXaeWV",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Читает таблицу записей, чтобы найти заявки со статусом «Нова»."
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatId = String($('Нове повідомлення').first().json.message.chat.id);\nconst NL = String.fromCharCode(10);\nconst esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst rows = $input.all().map((i) => i.json).filter((r) => r && r['ID'] && String(r['Статус'] || '').trim() === 'Нова');\nconst out = [];\nif (!rows.length) {\n  out.push({ chatId, kind: 'plain', id: '', url: 'https://t.me/', text: 'Нових заявок без часу немає ✓' });\n} else {\n  out.push({ chatId, kind: 'plain', id: '', url: 'https://t.me/', text: '<b>Нові заявки без часу: ' + rows.length + '</b>' + (rows.length > 15 ? NL + 'Показую перші 15, решта в таблиці.' : '') });\n  rows.slice(0, 15).forEach((r) => {\n    const id = String(r['ID']).trim().toUpperCase();\n    const tg = String(r['Telegram'] || '').replace(/^@/, '').trim();\n    let digits = String(r['Телефон'] || '').replace(/[^0-9]/g, '');\n    if (digits.length === 10 && digits[0] === '0') digits = '38' + digits;\n    const url = tg ? 'https://t.me/' + tg : (digits ? 'https://t.me/+' + digits : 'https://t.me/');\n    const text = '<b>Заявка #' + id + '</b> · ' + esc(r['Майстер']) + NL + esc(r['Процедура']) + NL + esc(r['Імʼя']) + ', ' + esc(r['Телефон']) + (tg ? ' · @' + esc(tg) : '') + (r['Нотатка'] ? NL + esc(r['Нотатка']) : '') + (r['Нотатка майстра'] ? NL + '✎ ' + esc(r['Нотатка майстра']) : '') + NL + 'Заявка від ' + esc(r['Записано']);\n    out.push({ chatId, kind: 'card', id, url, text });\n  });\n}\nreturn [{ json: { out } }];"
+      },
+      "id": "5968c3c6-d9dc-4af9-92fd-2929e89aff77",
+      "name": "Список нових",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        3152
+      ],
+      "notes": "Берёт заявки со статусом «Нова» (время ещё не назначено) и шлёт тому, кто нажал, по карточке с кнопками «Призначити час / Написати / Відхилити / Нотатка». Не больше 15 карточек за раз."
+    },
+    {
+      "parameters": {
+        "operation": "pinChatMessage",
+        "chatId": "={{ $json.result.chat.id }}",
+        "messageId": "={{ $json.result.message_id }}",
+        "additionalFields": {
+          "disable_notification": true
+        }
+      },
+      "id": "abab6600-3326-4d36-b55f-2def8cc03df0",
+      "name": "Закріпити меню",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        80
+      ],
+      "webhookId": "38d38f50-6126-48c9-8d3a-b3031e290e53",
+      "credentials": {
+        "telegramApi": {
+          "id": "v3GrhUj01nscd7j0",
+          "name": "Вакансии"
+        }
+      },
+      "notes": "Закрепляет сообщение с меню в личке админа без уведомления. Новый /menu перезакрепляет свежее."
+    }
+  ],
+  "connections": {
+    "Форма запису": {
+      "main": [
+        [
+          {
+            "node": "Нова заявка",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нова заявка": {
+      "main": [
+        [
+          {
+            "node": "Записати заявку",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записати заявку": {
+      "main": [
+        [
+          {
+            "node": "Сторінка подяки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Розгорнути повідомлення": {
+      "main": [
+        [
+          {
+            "node": "Тип повідомлення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Тип повідомлення": {
+      "main": [
+        [
+          {
+            "node": "Картка майстру",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Клієнтці з кнопками",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Запит адмінам",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Питання про час",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Картка запису",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Повідомлення без кнопок",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нове повідомлення": {
+      "main": [
+        [
+          {
+            "node": "Розібрати апдейт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Розібрати апдейт": {
+      "main": [
+        [
+          {
+            "node": "Куди?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Це кнопка?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Куди?": {
+      "main": [
+        [
+          {
+            "node": "Усі записи",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Команда чи запис?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Підказка клієнтці",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Нотатки: таблиця",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Усі записи": {
+      "main": [
+        [
+          {
+            "node": "Обробити дію",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обробити дію": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Що робимо?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Команда чи запис?": {
+      "main": [
+        [
+          {
+            "node": "Відповісти: підказка",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Діапазон дат",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Діапазон вільних",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Таблиця для нових",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI: розібрати запис",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Відповісти: підказка": {
+      "main": [
+        [
+          {
+            "node": "Закріпити меню",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Діапазон дат": {
+      "main": [
+        [
+          {
+            "node": "Записи за період",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записи за період": {
+      "main": [
+        [
+          {
+            "node": "Скласти розклад",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Скласти розклад": {
+      "main": [
+        [
+          {
+            "node": "Надіслати розклад",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: розібрати запис": {
+      "main": [
+        [
+          {
+            "node": "Перевірити дані",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI: розібрати запис",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Перевірити дані": {
+      "main": [
+        [
+          {
+            "node": "Дані повні?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Дані повні?": {
+      "main": [
+        [
+          {
+            "node": "Події на цей час",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Відповісти: чого не вистачає",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Події на цей час": {
+      "main": [
+        [
+          {
+            "node": "Перевірити слот",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Перевірити слот": {
+      "main": [
+        [
+          {
+            "node": "Слот вільний?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Слот вільний?": {
+      "main": [
+        [
+          {
+            "node": "Створити подію",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Відповісти: зайнято",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Створити подію": {
+      "main": [
+        [
+          {
+            "node": "Підтвердити запис",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Додати в таблицю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Це кнопка?": {
+      "main": [
+        [
+          {
+            "node": "Відповісти на кнопку",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Що робимо?": {
+      "main": [
+        [
+          {
+            "node": "Зайнятість майстра",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Оновити рядок",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Видалити подію",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Нотатка в подію",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Зайнятість майстра": {
+      "main": [
+        [
+          {
+            "node": "Перевірити слот заявки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Перевірити слот заявки": {
+      "main": [
+        [
+          {
+            "node": "Вільно?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Вільно?": {
+      "main": [
+        [
+          {
+            "node": "Подія вже є?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подія вже є?": {
+      "main": [
+        [
+          {
+            "node": "Перенести подію",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Створити подію заявки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Перенести подію": {
+      "main": [
+        [
+          {
+            "node": "Після календаря",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Після календаря": {
+      "main": [
+        [
+          {
+            "node": "Оновити рядок",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Створити подію заявки": {
+      "main": [
+        [
+          {
+            "node": "Після календаря",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Видалити подію": {
+      "main": [
+        [
+          {
+            "node": "Рядок після видалення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Рядок після видалення": {
+      "main": [
+        [
+          {
+            "node": "Оновити рядок",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Щовечора о 21:00": {
+      "main": [
+        [
+          {
+            "node": "Діапазон дат",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Кожні 15 хв": {
+      "main": [
+        [
+          {
+            "node": "Записи для нагадувань",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Нотатки для нагадувань",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Записи для нагадувань": {
+      "main": [
+        [
+          {
+            "node": "Кому нагадати",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Кому нагадати": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Оновити рядок",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Позначити нагадування адмінам",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нотатка в подію": {
+      "main": [
+        [
+          {
+            "node": "Рядок після видалення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нотатки: таблиця": {
+      "main": [
+        [
+          {
+            "node": "Обробити нотатку",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Обробити нотатку": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Нотатка: що робимо?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нотатка: що робимо?": {
+      "main": [
+        [
+          {
+            "node": "Нотатка: додати",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Нотатка: оновити",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нотатки для нагадувань": {
+      "main": [
+        [
+          {
+            "node": "Які нотатки нагадати",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Які нотатки нагадати": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Нотатка: оновити",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Діапазон вільних": {
+      "main": [
+        [
+          {
+            "node": "Календар на тиждень",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Календар на тиждень": {
+      "main": [
+        [
+          {
+            "node": "Порахувати вільні",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Порахувати вільні": {
+      "main": [
+        [
+          {
+            "node": "Надіслати розклад",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Таблиця для нових": {
+      "main": [
+        [
+          {
+            "node": "Список нових",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Список нових": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути повідомлення",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "nodeGroups": [
+    {
+      "id": "fe57063c-fbf9-4d76-a21a-2b242f7d1d44",
+      "name": "Ручний запис текстом",
+      "nodeIds": [
+        "7de90733-61fe-48ba-a999-686a1af21e78",
+        "6fe21ecf-4709-4c98-9738-c6403347d811",
+        "3649c303-784a-4ab9-bb69-62eefc0b4eb1",
+        "41ea4f5a-f5ab-4365-9ee3-31f44c77675c",
+        "bdf3e3d5-d30b-4cf6-820e-82e3a832bbaa",
+        "8866ff71-2761-4d36-91bf-2f19e6d1afde",
+        "bbad811d-100a-4805-8e85-3ed023fe03cb",
+        "2cc1c3f6-1b9e-4e8a-9ca6-c2a8b3325760",
+        "5affefac-6b97-47f3-aff0-1d4a90779da8",
+        "c813cbe8-f415-4973-bd1c-464bb6c00240",
+        "699ea802-6669-4014-ae49-a5dc84a50e40",
+        "9682ee04-81d4-4439-b935-a4c1ca9f1aec"
+      ],
+      "description": "Адмін пише запис одним повідомленням, Groq розбирає, перевірка слоту, календар і таблиця"
+    },
+    {
+      "id": "bff27cfc-5361-4bf9-806b-c1efb9ba02b6",
+      "name": "Розбір дії",
+      "nodeIds": [
+        "c976f5be-ecaf-447b-9c7e-e52f8f5108b0",
+        "d6560906-4dac-48db-909e-c9768bb4f808"
+      ],
+      "description": "Читає таблицю, знаходить заявку за ID і вирішує, що робити"
+    },
+    {
+      "id": "04f506c8-d9a1-40eb-a535-b736da29efa3",
+      "name": "Нагадування клієнткам",
+      "nodeIds": [
+        "cc428d0f-e0b7-488a-9b1a-d5cfdcec1f96",
+        "9e89c5ff-6a2a-47b4-86b9-0c399ef0d496"
+      ],
+      "description": "Раз на 15 хв: нагадування за добу з кнопками і за годину до візиту"
+    },
+    {
+      "id": "4ec01673-0cca-48c0-9afb-0200fd27d67c",
+      "name": "Відправка повідомлень",
+      "nodeIds": [
+        "eae96711-890c-492e-9886-e5d2a676f5a6",
+        "a7e5475e-882a-4d8c-9211-a74c2a0e3bb2",
+        "0a449199-8a76-429a-a3f5-20a1e9551cad",
+        "2f270bf8-a38a-4f77-bcaf-60f51bca7b2d",
+        "8c5a0cb0-3209-4ddd-beeb-9cfb7ac3dc47",
+        "0e4e8c3d-2828-4961-b449-362d69d5f1a0",
+        "681be01c-2c6c-43ac-9ced-085286b9dd55",
+        "8b8fb835-3ec5-4df1-a16f-3f7058e6231a"
+      ],
+      "description": "Розгортає масив out і шле кожне повідомлення з потрібними кнопками"
+    }
+  ],
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "6d13f75f32cd3f468e4ae571898087eac66e3d5d745557efe8b453f0f7844529"
+  }
+}
