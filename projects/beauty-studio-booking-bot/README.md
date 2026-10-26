@@ -51,13 +51,33 @@ Self-hosted n8n на PikaPods, без платних API.
 4. Створи таблицю з колонками з ноди «Записати заявку» і лист «Нотатки».
 5. Активуй воркфлоу.
 
-## Скріншоти
+## Схема
 
-![Воркфлоу в n8n](screenshots/workflow.png)
-![Меню бота](screenshots/menu.png)
-![Адмін-панель](screenshots/admin-panel.png)
+```mermaid
+flowchart LR
+    F["Форма запису"] --> N["Нова заявка<br/>ID, майстриня, тривалість"]
+    N --> S[("Google Sheets")]
+    N --> C1["Картка майстрині<br/>в Telegram"]
 
-Імена і телефони на скріншотах тестові. Реальні дані клієнток не публікуються.
+    T["Telegram:<br/>повідомлення і кнопки"] --> P["Розібрати апдейт"]
+    P --> R{"Що прийшло?"}
+    R -->|"час, кнопка"| A["Обробити дію"]
+    R -->|"запис текстом"| G["Groq: розбір запису"]
+    R -->|"/today, /week"| SC["Розклад"]
+    R -->|"! нотатка"| NT["Особисті нотатки"]
+    G --> CHK["Перевірка слоту<br/>цієї майстрині"]
+    A --> CHK
+    CHK --> CAL[("Google Calendar")]
+    CAL --> S
+    CAL --> OUT["Підтвердження клієнтці<br/>і майстриням"]
+
+    E["Щовечора 21:00"] --> SC
+    Q["Кожні 15 хв"] --> REM["Кому нагадати"]
+    REM --> OUT2["Нагадування за добу<br/>і за годину"]
+    REM --> S
+```
+
+Реальні дані клієнток не публікуються.
 
 ---
 
@@ -114,6 +134,30 @@ Self-hosted n8n on PikaPods, no paid APIs.
 4. Create a sheet with the columns from the "Записати заявку" node and a "Нотатки" tab.
 5. Activate the workflow.
 
-## Screenshots
+## Diagram
 
-See the images above. Names and phone numbers are test data. No real client data is published.
+```mermaid
+flowchart LR
+    F["Booking form"] --> N["New request<br/>ID, master, duration"]
+    N --> S[("Google Sheets")]
+    N --> C1["Card to the master<br/>in Telegram"]
+
+    T["Telegram:<br/>messages and buttons"] --> P["Parse update"]
+    P --> R{"What came in?"}
+    R -->|"time, button"| A["Handle action"]
+    R -->|"free-text booking"| G["Groq: parse booking"]
+    R -->|"/today, /week"| SC["Schedule"]
+    R -->|"! note"| NT["Personal notes"]
+    G --> CHK["Slot check<br/>for that master"]
+    A --> CHK
+    CHK --> CAL[("Google Calendar")]
+    CAL --> S
+    CAL --> OUT["Confirmation to client<br/>and masters"]
+
+    E["Every evening 21:00"] --> SC
+    Q["Every 15 min"] --> REM["Who needs a reminder"]
+    REM --> OUT2["Reminders a day<br/>and an hour before"]
+    REM --> S
+```
+
+No real client data is published.
